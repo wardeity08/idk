@@ -1,25 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>OpenShelf</title>
+  <title>OpenShelf — Stories worth getting lost in.</title>
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<!-- NAVBAR -->
-
 <header>
   <div class="nav">
 
-    <div class="logo">
-      📖 OpenShelf
-    </div>
+    <a href="#" class="logo">
+      ◧ OpenShelf
+    </a>
 
     <nav>
       <a href="#library">Library</a>
@@ -27,7 +24,7 @@
       <a href="#about">About</a>
     </nav>
 
-    <a class="nav-button" href="#submit">
+    <a href="#submit" class="nav-button">
       Add a Book
     </a>
 
@@ -35,174 +32,102 @@
 </header>
 
 
-<!-- HERO -->
+<main>
 
-<section class="hero">
+  <!-- HERO -->
 
-  <div class="hero-text">
+  <section class="hero">
 
-    <p class="eyebrow">
-      A LIBRARY BUILT BY READERS
-    </p>
+    <div class="hero-overlay"></div>
 
-    <h1>
-      Stories worth
-      <span>getting lost in.</span>
-    </h1>
+    <div class="hero-content">
 
-    <p class="description">
-      Discover stories, read chapter by chapter,
-      and share your own books with other readers.
-    </p>
+      <div class="eyebrow">
+        A LIBRARY BUILT BY READERS
+      </div>
 
-    <div class="hero-buttons">
+      <h1>
+        Stories worth
+        <span>getting lost in.</span>
+      </h1>
 
-      <a class="main-button" href="#library">
-        Explore Library →
-      </a>
-
-      <a class="secondary-button" href="#submit">
-        Submit a Book
-      </a>
-
-    </div>
-
-  </div>
-
-
-  <!-- BOOK ART -->
-
-  <div class="books-art">
-
-    <div class="book book-one">
-      THE<br>
-      LAST<br>
-      TRAIN
-    </div>
-
-    <div class="book book-two">
-      THE<br>
-      HOUSE<br>
-      WITH NO<br>
-      CLOCK
-    </div>
-
-    <div class="book book-three">
-      THE<br>
-      ORDER<br>
-      WITHIN
-    </div>
-
-  </div>
-
-</section>
-
-
-
-<!-- LIBRARY -->
-
-<section id="library" class="library">
-
-  <div class="section-heading">
-
-    <div>
-      <p class="eyebrow">
-        THE COLLECTION
+      <p class="hero-description">
+        Discover stories, read chapter by chapter,
+        and share your own books with other readers.
       </p>
 
-      <h2>
-        Explore the library
-      </h2>
+      <div class="hero-buttons">
+
+        <a href="#library" class="main-button">
+          Explore Library →
+        </a>
+
+        <a href="#submit" class="secondary-button">
+          Submit a Book
+        </a>
+
+      </div>
+
     </div>
 
-  </div>
+    <div class="hero-decoration">
+
+      <div class="floating-book book-a">
+        <span>THE LAST<br>TRAIN</span>
+      </div>
+
+      <div class="floating-book book-b">
+        <span>THE HOUSE<br>WITH NO CLOCK</span>
+      </div>
+
+      <div class="floating-book book-c">
+        <span>THE ORDER<br>WITHIN</span>
+      </div>
+
+    </div>
+
+  </section>
 
 
-  <div class="library-tools">
+  <!-- LIBRARY -->
 
-    <input
-      id="search"
-      type="text"
-      placeholder="Search books, authors or genres..."
-    >
+  <section id="library" class="library">
 
-    <select id="genreFilter">
+    <div class="library-top">
 
-      <option value="all">
-        All genres
-      </option>
+      <div>
+        <div class="eyebrow">THE COLLECTION</div>
 
-      <option value="Mystery">
-        Mystery
-      </option>
+        <h2>
+          Featured Books
+        </h2>
+      </div>
 
-      <option value="Fantasy">
-        Fantasy
-      </option>
-
-      <option value="Sci-Fi">
-        Sci-Fi
-      </option>
-
-      <option value="Psychological Thriller">
-        Psychological Thriller
-      </option>
-
-    </select>
-
-  </div>
-
-
-  <div id="books" class="book-grid"></div>
-
-</section>
-
-
-
-<!-- SUBMIT BOOK -->
-
-<section id="submit" class="submit-section">
-
-  <div class="submit-box">
-
-    <div>
-
-      <p class="eyebrow">
-        SHARE YOUR STORY
-      </p>
-
-      <h2>
-        Add your book
-      </h2>
-
-      <p>
-        Have a story of your own?
-        Submit it to OpenShelf and let other readers discover it.
-      </p>
+      <span class="view-all">
+        View All →
+      </span>
 
     </div>
 
 
-    <form id="bookForm">
+    <div class="library-tools">
 
-      <input
-        id="bookTitle"
-        type="text"
-        placeholder="Book title"
-        required
-      >
+      <div class="search-box">
 
-      <input
-        id="bookAuthor"
-        type="text"
-        placeholder="Author name"
-        required
-      >
+        <span>⌕</span>
 
-      <select id="bookGenre" required>
+        <input
+          id="search"
+          type="text"
+          placeholder="Search books, authors, genres..."
+        >
 
-        <option value="">
-          Select genre
+      </div>
+
+      <select id="genreFilter">
+
+        <option value="all">
+          All Genres
         </option>
 
         <option value="Mystery">
@@ -217,74 +142,138 @@
           Sci-Fi
         </option>
 
-        <option value="Romance">
-          Romance
-        </option>
-
-        <option value="Horror">
-          Horror
-        </option>
-
-        <option value="Other">
-          Other
+        <option value="Psychological Thriller">
+          Psychological Thriller
         </option>
 
       </select>
 
-
-      <textarea
-        id="bookDescription"
-        placeholder="Short description of your book..."
-        required
-      ></textarea>
+    </div>
 
 
-      <button type="submit">
-        Submit Book →
-      </button>
+    <div id="books" class="book-grid"></div>
 
-      <p id="submitMessage"></p>
-
-    </form>
-
-  </div>
-
-</section>
+  </section>
 
 
+  <!-- SUBMIT -->
 
-<!-- ABOUT -->
+  <section id="submit" class="submit-section">
 
-<section id="about" class="about">
+    <div class="submit-box">
 
-  <p class="eyebrow">
-    ABOUT OPENSHELF
-  </p>
+      <div>
 
-  <h2>
-    Read. Discover. Share.
-  </h2>
+        <div class="eyebrow">
+          YOUR STORY
+        </div>
 
-  <p>
-    OpenShelf is a community library created for readers
-    who want to discover stories and share their own.
-  </p>
+        <h2>
+          Put your book<br>
+          on the shelf.
+        </h2>
 
-</section>
+        <p>
+          Have something you've written?
+          Add it to the OpenShelf community.
+        </p>
+
+      </div>
 
 
+      <form id="bookForm">
 
-<!-- FOOTER -->
+        <input
+          id="bookTitle"
+          type="text"
+          placeholder="Book title"
+          required
+        >
+
+        <input
+          id="bookAuthor"
+          type="text"
+          placeholder="Author"
+          required
+        >
+
+        <select id="bookGenre" required>
+
+          <option value="">
+            Select genre
+          </option>
+
+          <option value="Mystery">
+            Mystery
+          </option>
+
+          <option value="Fantasy">
+            Fantasy
+          </option>
+
+          <option value="Sci-Fi">
+            Sci-Fi
+          </option>
+
+          <option value="Psychological Thriller">
+            Psychological Thriller
+          </option>
+
+        </select>
+
+        <textarea
+          id="bookDescription"
+          placeholder="Short description..."
+          required
+        ></textarea>
+
+        <button type="submit">
+          Add to OpenShelf →
+        </button>
+
+        <div id="submitMessage"></div>
+
+      </form>
+
+    </div>
+
+  </section>
+
+
+  <!-- ABOUT -->
+
+  <section id="about" class="about">
+
+    <div class="eyebrow">
+      ABOUT OPENSHELF
+    </div>
+
+    <h2>
+      Books are better<br>
+      when they're shared.
+    </h2>
+
+    <p>
+      OpenShelf is a small community library built for readers
+      and writers who want a simple place to discover stories,
+      read them, and put their own work on the shelf.
+    </p>
+
+  </section>
+
+</main>
+
 
 <footer>
 
   <div>
     <strong>OpenShelf</strong>
-    <span>Made for readers.</span>
+    <span>Stories worth getting lost in.</span>
   </div>
 
   <div class="creator">
-    Created by <strong>Nikender Singh</strong>
+    <span>Created by</span>
+    <strong>Nikender</strong>
   </div>
 
 </footer>
