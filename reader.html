@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>OpenShelf Reader</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    .reader {
+      max-width: 850px;
+      margin: auto;
+      padding: 80px 20px;
+    }
+
+    .reader-box {
+      background: #fffdf8;
+      border: 1px solid #ddd6c9;
+      border-radius: 18px;
+      padding: 60px;
+      box-shadow: 0 20px 60px rgba(0,0,0,.08);
+    }
+
+    .reader h1 {
+      font-family: Georgia, serif;
+      font-size: 55px;
+      line-height: 1;
+    }
+
+    .author {
+      color: #77736a;
+    }
+
+    .story {
+      margin-top: 50px;
+      font-family: Georgia, serif;
+      font-size: 19px;
+      line-height: 2;
+      white-space: pre-line;
+      color: #37352f;
+    }
+
+    .controls {
+      margin-top: 50px;
+      padding-top: 25px;
+      border-top: 1px solid #ddd6c9;
+
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .controls button {
+      padding: 10px 18px;
+      border: 1px solid #ddd6c9;
+      background: transparent;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .controls button:hover {
+      background: #20201d;
+      color: white;
+    }
+
+    #chapterSelect {
+      margin-top: 25px;
+      padding: 10px;
+      border: 1px solid #ddd6c9;
+      border-radius: 8px;
+      background: white;
+    }
+
+    @media(max-width:600px) {
+      .reader-box {
+        padding: 30px;
+      }
+
+      .reader h1 {
+        font-size: 40px;
+      }
+    }
+  </style>
+
+</head>
+
+
+<body>
+
+<header>
+
+  <div class="nav">
+
+    <a class="logo" href="index.html">
+      📖 OpenShelf
+    </a>
+
+    <a href="index.html">
+      ← Back to library
+    </a>
+
+  </div>
+
+</header>
+
+
+<main class="reader">
+
+  <div class="reader-box">
+
+    <p class="eyebrow" id="genre"></p>
+
+    <h1 id="title"></h1>
+
+    <p class="author" id="author"></p>
+
+    <select id="chapterSelect"></select>
+
+    <h2 id="chapterTitle"></h2>
+
+    <div class="story" id="story"></div>
+
+    <div class="controls">
+
+      <button onclick="previousChapter()">
+        ← Previous
+      </button>
+
+      <span id="chapterNumber"></span>
+
+      <button onclick="nextChapter()">
+        Next →
+      </button>
+
+    </div>
+
+  </div>
+
+</main>
+
+
+<script>
+
+const books = {
+
+  "last-train": {
+
+    title: "The Last Train",
+
+    author: "Mara Ellis",
+
+    genre: "Mystery",
+
+    chapters: [
+
+      {
+        title: "Chapter One — Platform 6",
+
+        text: `The station clock had stopped at 11:47.
+
+Mara stepped onto Platform 6 with a suitcase and a letter.
+
+The letter contained only one sentence:
+
+Do not take the last train home.
+
+The rails began to hum in the distance.
+
+A train was coming.`
+      },
+
+      {
+        title: "Chapter Two — The Empty Carriage",
+
+        text: `The doors opened without a sound.
+
+Every seat was empty except one.
+
+On it sat a black notebook.
+
+Mara picked it up.
+
+The first page contained a list of names.
+
+Four had been crossed out.
+
+The fifth was hers.`
+      },
+
+      {
+        title: "Chapter Three — 11:47",
+
+        text: `Mara looked at the station clock.
+
+It still said 11:47.
+
+Then the train lights went out.
+
+Someone whispered her name from the end of the carriage.`
+      }
+
+    ]
+
+  },
+
+
+  "house": {
+
+    title: "The House With No Clock",
+
+    author: "Eli Mercer",
+
+    genre: "Fantasy",
+
+    chapters: [
+
+      {
+        title: "Chapter One — The Door",
+
+        text: `At midnight, the house appeared at the end of the road.
+
+It had not been there at eleven.
+
+The front door was open.
+
+Elias stepped inside.`
+      },
+
+      {
+        title: "Chapter Two — The Hallway",
+
+        text: `There were no clocks in the house.
+
+Instead, every wall carried a small painted eye.
+
+When Elias walked past them, the eyes turned.`
+      },
+
+      {
+        title: "Chapter Three — Upstairs",
+
+        text: `The room upstairs contained a chair and a window.
+
+Through the window was a street Elias had never seen.
+
+Then he recognized it.
+
+It was his own street.`
+      }
+
+    ]
+
+  },
+
+
+  "letters": {
+
+    title: "Letters From Tomorrow",
+
+    author: "Noah Vale",
+
+    genre: "Sci-Fi",
+
+    chapters: [
+
+      {
+        title: "Chapter One — The First Letter",
+
+        text: `The envelope had no stamp.
+
+No address.
+
+Only his name.
+
+The handwriting looked familiar.
+
+It was his own handwriting.`
+      },
+
+      {
+        title: "Chapter Two — Thursday",
+
+        text: `The letter described Thursday in impossible detail.
+
+Every prediction came true.
+
+By evening, Noah was beginning to believe the letters.`
+      },
+
+      {
+        title: "Chapter Three — Don't Open The Fourth",
+
+        text: `The third letter ended with a warning.
+
+The fourth envelope would arrive Monday.
+
+Do not open it.`
+      }
+
+    ]
+
+  }
+
+};
+
+
+const params =
+  new URLSearchParams(window.location.search);
+
+const book =
+  books[params.get("book")] || books["last-train"];
+
+
+let currentChapter = 0;
+
+
+document.getElementById("title").textContent =
+  book.title;
+
+document.getElementById("author").textContent =
+  "by " + book.author;
+
+document.getElementById("genre").textContent =
+  book.genre;
+
+
+const select =
+  document.getElementById("chapterSelect");
+
+
+book.chapters.forEach((chapter, index) => {
+
+  const option =
+    document.createElement("option");
+
+  option.value = index;
+
+  option.textContent =
+    chapter.title;
+
+  select.appendChild(option);
+
+});
+
+
+select.addEventListener("change", function() {
+
+  currentChapter =
+    Number(select.value);
+
+  showChapter();
+
+});
+
+
+function showChapter() {
+
+  const chapter =
+    book.chapters[currentChapter];
+
+  document.getElementById("chapterTitle")
+    .textContent = chapter.title;
+
+  document.getElementById("story")
+    .textContent = chapter.text;
+
+  document.getElementById("chapterNumber")
+    .textContent =
+      "Chapter " +
+      (currentChapter + 1) +
+      " / " +
+      book.chapters.length;
+
+  select.value =
+    currentChapter;
+}
+
+
+function nextChapter() {
+
+  if (
+    currentChapter <
+    book.chapters.length - 1
+  ) {
+
+    currentChapter++;
+
+    showChapter();
+
+    window.scrollTo(0, 0);
+  }
+
+}
+
+
+function previousChapter() {
+
+  if (currentChapter > 0) {
+
+    currentChapter--;
+
+    showChapter();
+
+    window.scrollTo(0, 0);
+  }
+
+}
+
+
+showChapter();
+
+</script>
+
+</body>
+</html>
