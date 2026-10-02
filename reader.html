@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,6 +10,11 @@
   <link rel="stylesheet" href="style.css">
 
   <style>
+
+    /* =========================================================
+       READER BASE
+    ========================================================= */
+
     html,
     body {
       margin: 0;
@@ -22,10 +28,32 @@
     }
 
     .reader-page {
+      min-height: 100vh;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
     }
+
+
+    /* =========================================================
+       DARK READING THEME
+    ========================================================= */
+
+    body.reader-dark {
+      --bg: #171717;
+      --surface: #242424;
+      --surface-2: #2d2d2d;
+      --text: #e8e5df;
+      --muted: #aaa59d;
+      --accent: #c79b62;
+      --accent-2: #d28b62;
+      --border: rgba(255,255,255,0.10);
+      --shadow: 0 15px 40px rgba(0,0,0,0.35);
+    }
+
+
+    /* =========================================================
+       HEADER
+    ========================================================= */
 
     .reader-header {
       position: sticky;
@@ -36,68 +64,188 @@
       justify-content: space-between;
       align-items: center;
 
-      padding: 16px 28px;
+      padding: 12px 24px;
 
-      background: var(--surface);
+      background: color-mix(
+        in srgb,
+        var(--bg) 94%,
+        transparent
+      );
+
+      backdrop-filter: blur(16px);
+
       border-bottom: 1px solid var(--border);
     }
 
     .reader-left {
       display: flex;
       align-items: center;
-      gap: 18px;
+      gap: 15px;
     }
 
     .reader-title {
-      font-weight: 700;
+      font-family: "Playfair Display", Georgia, serif;
+      font-weight: 600;
       font-size: 20px;
     }
 
     .back-button,
-    .reader-theme {
+    .reader-theme,
+    .reader-control-button {
       background: var(--surface);
       color: var(--text);
 
       border: 1px solid var(--border);
       border-radius: 10px;
 
-      padding: 9px 14px;
+      padding: 8px 12px;
+
+      cursor: pointer;
+
+      transition: 0.2s ease;
+    }
+
+    .back-button:hover,
+    .reader-theme:hover,
+    .reader-control-button:hover {
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+
+
+    /* =========================================================
+       READER TOOLBAR
+    ========================================================= */
+
+    .reader-tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .font-controls {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      background: var(--surface);
+
+      border: 1px solid var(--border);
+      border-radius: 10px;
+
+      padding: 3px;
+    }
+
+    .font-size-label {
+      min-width: 35px;
+      text-align: center;
+
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+
+    /* =========================================================
+       MUSIC
+    ========================================================= */
+
+    .music-box {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+
+      background: var(--surface);
+
+      border: 1px solid var(--border);
+      border-radius: 10px;
+
+      padding: 4px;
+    }
+
+    .music-select {
+      max-width: 145px;
+
+      padding: 6px 7px;
+
+      border: 0;
+      outline: 0;
+
+      background: transparent;
+      color: var(--text);
+
       cursor: pointer;
     }
 
+    .music-volume {
+      width: 65px;
+      accent-color: var(--accent);
+    }
+
+
+    /* =========================================================
+       READER CONTAINER
+    ========================================================= */
+
     .reader-container {
-      width: min(900px, calc(100% - 32px));
+      width: min(900px, calc(100% - 30px));
+
       margin: 0 auto;
+
       padding: 55px 0 100px;
     }
 
     .reader-book-title {
       margin: 0;
-      font-size: clamp(32px, 5vw, 52px);
-      line-height: 1.15;
+
+      font-family: "Playfair Display", Georgia, serif;
+
+      font-size: clamp(38px, 6vw, 65px);
+
+      line-height: 1.05;
     }
 
     .reader-author {
       margin-top: 12px;
-      margin-bottom: 45px;
-      opacity: 0.7;
+      margin-bottom: 40px;
+
+      color: var(--muted);
+
       font-size: 17px;
     }
 
+
+    /* =========================================================
+       BOOK CONTENT
+    ========================================================= */
+
     #readerContent {
-      background: var(--surface);
-      color: var(--text);
+      width: 100%;
 
       padding: 55px 65px;
 
-      border-radius: 18px;
+      background: var(--surface);
+      color: var(--text);
+
       border: 1px solid var(--border);
+      border-radius: var(--radius);
+
+      box-shadow: var(--shadow);
 
       font-family: Georgia, "Times New Roman", serif;
-      font-size: 19px;
+
+      font-size: var(--reader-font-size, 19px);
+
       line-height: 1.9;
 
       min-height: 70vh;
+
+      transition:
+        background 0.3s ease,
+        color 0.3s ease,
+        font-size 0.2s ease;
     }
 
     #readerContent * {
@@ -115,14 +263,46 @@
     #readerContent h4,
     #readerContent h5,
     #readerContent h6 {
-      font-family: Georgia, "Times New Roman", serif;
-      margin-top: 35px;
+
+      margin-top: 45px;
       margin-bottom: 18px;
+
+      font-family: Georgia, "Times New Roman", serif;
+
       line-height: 1.3;
     }
 
+    #readerContent img {
+      max-width: 100%;
+      height: auto;
+    }
+
+
+    /* =========================================================
+       HIGHLIGHT
+    ========================================================= */
+
+    #readerContent .openshelf-highlight {
+      background: #ffe28a !important;
+      color: #171717 !important;
+
+      border-radius: 3px;
+
+      padding: 1px 2px;
+    }
+
+    .highlight-active {
+      border-color: #e1b94d !important;
+    }
+
+
+    /* =========================================================
+       PROGRESS
+    ========================================================= */
+
     .progress-wrapper {
       position: fixed;
+
       top: 0;
       left: 0;
 
@@ -133,58 +313,113 @@
     }
 
     #progressBar {
-      width: 0%;
+      width: 0;
       height: 100%;
+
       background: var(--accent);
+
       transition: width 0.1s linear;
     }
 
+
+    /* =========================================================
+       LOADING / ERROR
+    ========================================================= */
+
     .loading-message {
       opacity: 0.7;
+
       text-align: center;
+
       padding: 50px 0;
     }
 
     .error-message {
       text-align: center;
+
       padding: 50px 0;
     }
+
+
+    /* =========================================================
+       MOBILE
+    ========================================================= */
+
+    @media (max-width: 900px) {
+
+      .reader-header {
+        align-items: flex-start;
+        gap: 10px;
+      }
+
+      .reader-tools {
+        max-width: 70%;
+      }
+
+      .music-volume {
+        display: none;
+      }
+    }
+
 
     @media (max-width: 700px) {
 
       .reader-header {
-        padding: 12px 16px;
+        padding: 10px 12px;
       }
 
       .reader-title {
         display: none;
       }
 
+      .reader-tools {
+        max-width: 100%;
+      }
+
+      .reader-theme {
+        max-width: 120px;
+      }
+
+      .music-select {
+        max-width: 100px;
+      }
+
       .reader-container {
-        width: calc(100% - 20px);
+        width: 94%;
+
         padding-top: 35px;
       }
 
       #readerContent {
-        padding: 30px 22px;
-        font-size: 17px;
+        padding: 32px 22px;
+
+        font-size: var(--reader-font-size, 17px);
+
         line-height: 1.8;
+
         border-radius: 12px;
       }
     }
+
   </style>
+
 </head>
+
 
 <body class="reader-page">
 
-  <!-- READING PROGRESS -->
+  <!-- =======================================================
+       READING PROGRESS
+  ======================================================== -->
 
   <div class="progress-wrapper">
     <div id="progressBar"></div>
   </div>
 
 
-  <!-- HEADER -->
+  <!-- =======================================================
+       HEADER
+  ======================================================== -->
 
   <header class="reader-header">
 
@@ -203,13 +438,129 @@
     </div>
 
 
-    <div class="reader-controls">
+    <div class="reader-tools">
 
-      <select id="readerTheme" class="reader-theme">
-        <option value="light">☀️ Light</option>
-        <option value="cozy">📚 Cozy Library</option>
-        <option value="cafe">☕ Café & Books</option>
-        <option value="editorial">📰 Editorial</option>
+      <!-- FONT SIZE -->
+
+      <div class="font-controls">
+
+        <button
+          id="fontDown"
+          class="reader-control-button"
+          title="Decrease font size">
+          A−
+        </button>
+
+        <span
+          id="fontSizeLabel"
+          class="font-size-label">
+          19
+        </span>
+
+        <button
+          id="fontUp"
+          class="reader-control-button"
+          title="Increase font size">
+          A+
+        </button>
+
+        <button
+          id="fontReset"
+          class="reader-control-button"
+          title="Reset font size">
+          ↺
+        </button>
+
+      </div>
+
+
+      <!-- HIGHLIGHT -->
+
+      <button
+        id="highlightButton"
+        class="reader-control-button"
+        title="Highlight selected text">
+        🖍️
+      </button>
+
+
+      <!-- MUSIC -->
+
+      <div class="music-box">
+
+        <select
+          id="musicSelect"
+          class="music-select"
+          title="Choose reading music">
+
+          <option value="none">
+            🎵 Music Off
+          </option>
+
+          <option value="rain">
+            🌧️ Rain
+          </option>
+
+          <option value="piano">
+            🎹 Soft Piano
+          </option>
+
+          <option value="night">
+            🌙 Night
+          </option>
+
+          <option value="cafe">
+            ☕ Café
+          </option>
+
+        </select>
+
+        <button
+          id="musicPlay"
+          class="reader-control-button"
+          title="Play / Pause">
+          ▶
+        </button>
+
+        <input
+          id="musicVolume"
+          class="music-volume"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value="0.25"
+          title="Volume">
+
+      </div>
+
+
+      <!-- THEME -->
+
+      <select
+        id="readerTheme"
+        class="reader-theme">
+
+        <option value="light">
+          ☀️ Light
+        </option>
+
+        <option value="cozy">
+          📚 Cozy Library
+        </option>
+
+        <option value="cafe">
+          ☕ Café & Books
+        </option>
+
+        <option value="editorial">
+          📰 Editorial
+        </option>
+
+        <option value="dark">
+          🌙 Dark
+        </option>
+
       </select>
 
     </div>
@@ -217,7 +568,9 @@
   </header>
 
 
-  <!-- BOOK -->
+  <!-- =======================================================
+       BOOK
+  ======================================================== -->
 
   <main class="reader-container">
 
@@ -245,20 +598,25 @@
   </main>
 
 
-  <!-- SUPABASE -->
+  <!-- =======================================================
+       SUPABASE
+  ======================================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- MAMMOTH -->
+
+  <!-- =======================================================
+       MAMMOTH
+  ======================================================== -->
 
   <script src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js"></script>
 
 
   <script>
 
-    // =========================
-    // SUPABASE
-    // =========================
+    /* =======================================================
+       SUPABASE
+    ======================================================== */
 
     const SUPABASE_URL =
       "https://kdycmaicayaesnpkqfgp.supabase.co";
@@ -273,9 +631,9 @@
       );
 
 
-    // =========================
-    // ELEMENTS
-    // =========================
+    /* =======================================================
+       ELEMENTS
+    ======================================================== */
 
     const titleElement =
       document.getElementById("readerBookTitle");
@@ -292,45 +650,630 @@
     const progressBar =
       document.getElementById("progressBar");
 
+    const fontDown =
+      document.getElementById("fontDown");
 
-    // =========================
-    // THEME
-    // =========================
+    const fontUp =
+      document.getElementById("fontUp");
 
-    const savedTheme =
-      localStorage.getItem("openshelf-theme") || "light";
+    const fontReset =
+      document.getElementById("fontReset");
 
-    document.body.setAttribute(
-      "data-theme",
-      savedTheme
-    );
+    const fontSizeLabel =
+      document.getElementById("fontSizeLabel");
 
-    themeSelector.value = savedTheme;
+    const highlightButton =
+      document.getElementById("highlightButton");
+
+    const musicSelect =
+      document.getElementById("musicSelect");
+
+    const musicPlay =
+      document.getElementById("musicPlay");
+
+    const musicVolume =
+      document.getElementById("musicVolume");
+
+
+    /* =======================================================
+       READER THEME
+    ======================================================== */
+
+    const savedReaderTheme =
+      localStorage.getItem("openshelf-reader-theme") || "light";
+
+    applyReaderTheme(savedReaderTheme);
+
+    themeSelector.value =
+      savedReaderTheme;
 
 
     themeSelector.addEventListener(
       "change",
       function () {
 
-        const theme = this.value;
-
-        document.body.setAttribute(
-          "data-theme",
-          theme
-        );
+        applyReaderTheme(this.value);
 
         localStorage.setItem(
-          "openshelf-theme",
-          theme
+          "openshelf-reader-theme",
+          this.value
         );
 
       }
     );
 
 
-    // =========================
-    // GET BOOK ID
-    // =========================
+    function applyReaderTheme(theme) {
+
+      document.body.classList.toggle(
+        "reader-dark",
+        theme === "dark"
+      );
+
+      document.body.setAttribute(
+        "data-theme",
+        theme === "dark"
+          ? "light"
+          : theme
+      );
+
+    }
+
+
+    /* =======================================================
+       FONT SIZE
+    ======================================================== */
+
+    let readerFontSize =
+      Number(
+        localStorage.getItem(
+          "openshelf-font-size"
+        )
+      ) || 19;
+
+
+    function updateFontSize() {
+
+      readerFontSize =
+        Math.max(
+          14,
+          Math.min(
+            30,
+            readerFontSize
+          )
+        );
+
+      contentElement.style.setProperty(
+        "--reader-font-size",
+        readerFontSize + "px"
+      );
+
+      fontSizeLabel.textContent =
+        readerFontSize;
+
+      localStorage.setItem(
+        "openshelf-font-size",
+        readerFontSize
+      );
+
+    }
+
+
+    fontDown.addEventListener(
+      "click",
+      function () {
+
+        readerFontSize -= 1;
+
+        updateFontSize();
+
+      }
+    );
+
+
+    fontUp.addEventListener(
+      "click",
+      function () {
+
+        readerFontSize += 1;
+
+        updateFontSize();
+
+      }
+    );
+
+
+    fontReset.addEventListener(
+      "click",
+      function () {
+
+        readerFontSize = 19;
+
+        updateFontSize();
+
+      }
+    );
+
+
+    updateFontSize();
+
+
+    /* =======================================================
+       HIGHLIGHT SELECTED TEXT
+    ======================================================== */
+
+    highlightButton.addEventListener(
+      "click",
+      function () {
+
+        const selection =
+          window.getSelection();
+
+        if (
+          !selection ||
+          selection.isCollapsed
+        ) {
+
+          alert(
+            "Select some text first."
+          );
+
+          return;
+        }
+
+
+        const range =
+          selection.getRangeAt(0);
+
+
+        if (
+          !contentElement.contains(
+            range.commonAncestorContainer
+          )
+        ) {
+
+          return;
+        }
+
+
+        try {
+
+          const span =
+            document.createElement("span");
+
+          span.className =
+            "openshelf-highlight";
+
+          range.surroundContents(span);
+
+          selection.removeAllRanges();
+
+        }
+
+        catch (error) {
+
+          /*
+             If the selection crosses multiple
+             HTML elements, use the browser's
+             built-in highlighting command.
+          */
+
+          document.execCommand(
+            "backColor",
+            false,
+            "#ffe28a"
+          );
+
+          selection.removeAllRanges();
+
+        }
+
+      }
+    );
+
+
+    /* =======================================================
+       MUSIC ENGINE
+       -------------------------------------------------------
+       These are built-in ambient soundscapes.
+       Nothing is uploaded and nothing is stored.
+    ======================================================== */
+
+    let audioContext = null;
+
+    let masterGain = null;
+
+    let musicNodes = [];
+
+    let musicRunning = false;
+
+
+    function createAudioContext() {
+
+      if (!audioContext) {
+
+        audioContext =
+          new (
+            window.AudioContext ||
+            window.webkitAudioContext
+          )();
+
+        masterGain =
+          audioContext.createGain();
+
+        masterGain.gain.value =
+          Number(
+            musicVolume.value
+          );
+
+        masterGain.connect(
+          audioContext.destination
+        );
+
+      }
+
+    }
+
+
+    function stopMusic() {
+
+      musicNodes.forEach(
+        function (node) {
+
+          try {
+
+            node.stop();
+
+          }
+
+          catch (e) {}
+
+        }
+      );
+
+      musicNodes = [];
+
+      musicRunning = false;
+
+      musicPlay.textContent = "▶";
+
+    }
+
+
+    function makeOscillator(
+      frequency,
+      type,
+      volume,
+      duration
+    ) {
+
+      const oscillator =
+        audioContext.createOscillator();
+
+      const gain =
+        audioContext.createGain();
+
+
+      oscillator.type =
+        type;
+
+      oscillator.frequency.value =
+        frequency;
+
+      gain.gain.value =
+        volume;
+
+
+      oscillator.connect(gain);
+
+      gain.connect(masterGain);
+
+
+      oscillator.start();
+
+      oscillator.stop(
+        audioContext.currentTime +
+        duration
+      );
+
+
+      musicNodes.push(
+        oscillator
+      );
+
+    }
+
+
+    function createRain() {
+
+      /*
+         Soft filtered noise.
+      */
+
+      const bufferSize =
+        audioContext.sampleRate * 2;
+
+      const buffer =
+        audioContext.createBuffer(
+          1,
+          bufferSize,
+          audioContext.sampleRate
+        );
+
+      const data =
+        buffer.getChannelData(0);
+
+
+      for (
+        let i = 0;
+        i < bufferSize;
+        i++
+      ) {
+
+        data[i] =
+          (Math.random() * 2 - 1) * 0.25;
+
+      }
+
+
+      const source =
+        audioContext.createBufferSource();
+
+      source.buffer =
+        buffer;
+
+      source.loop = true;
+
+
+      const filter =
+        audioContext.createBiquadFilter();
+
+      filter.type =
+        "lowpass";
+
+      filter.frequency.value =
+        1700;
+
+
+      const gain =
+        audioContext.createGain();
+
+      gain.gain.value =
+        0.35;
+
+
+      source
+        .connect(filter)
+        .connect(gain)
+        .connect(masterGain);
+
+
+      source.start();
+
+      musicNodes.push(source);
+
+    }
+
+
+    function createPiano() {
+
+      /*
+         Slow repeating soft chords.
+      */
+
+      const notes = [
+        261.63,
+        329.63,
+        392.00,
+        493.88
+      ];
+
+
+      notes.forEach(
+        function (note, index) {
+
+          setTimeout(
+            function () {
+
+              if (!musicRunning) {
+                return;
+              }
+
+              makeOscillator(
+                note,
+                "sine",
+                0.025,
+                4
+              );
+
+            },
+            index * 700
+          );
+
+        }
+      );
+
+    }
+
+
+    function createNight() {
+
+      makeOscillator(
+        110,
+        "sine",
+        0.025,
+        30
+      );
+
+      makeOscillator(
+        164.81,
+        "sine",
+        0.012,
+        30
+      );
+
+    }
+
+
+    function createCafe() {
+
+      makeOscillator(
+        130.81,
+        "triangle",
+        0.018,
+        30
+      );
+
+      makeOscillator(
+        196,
+        "triangle",
+        0.012,
+        30
+      );
+
+      makeOscillator(
+        261.63,
+        "sine",
+        0.008,
+        30
+      );
+
+    }
+
+
+    function startMusic() {
+
+      const selected =
+        musicSelect.value;
+
+
+      if (
+        selected === "none"
+      ) {
+
+        stopMusic();
+
+        return;
+
+      }
+
+
+      createAudioContext();
+
+
+      if (
+        audioContext.state === "suspended"
+      ) {
+
+        audioContext.resume();
+
+      }
+
+
+      stopMusic();
+
+
+      musicRunning = true;
+
+
+      if (selected === "rain") {
+
+        createRain();
+
+      }
+
+      else if (
+        selected === "piano"
+      ) {
+
+        createPiano();
+
+      }
+
+      else if (
+        selected === "night"
+      ) {
+
+        createNight();
+
+      }
+
+      else if (
+        selected === "cafe"
+      ) {
+
+        createCafe();
+
+      }
+
+
+      musicPlay.textContent =
+        "⏸";
+
+    }
+
+
+    musicPlay.addEventListener(
+      "click",
+      function () {
+
+        if (musicRunning) {
+
+          stopMusic();
+
+        }
+
+        else {
+
+          startMusic();
+
+        }
+
+      }
+    );
+
+
+    musicSelect.addEventListener(
+      "change",
+      function () {
+
+        if (
+          this.value === "none"
+        ) {
+
+          stopMusic();
+
+          return;
+
+        }
+
+
+        startMusic();
+
+      }
+    );
+
+
+    musicVolume.addEventListener(
+      "input",
+      function () {
+
+        if (masterGain) {
+
+          masterGain.gain.value =
+            Number(
+              this.value
+            );
+
+        }
+
+      }
+    );
+
+
+    /* =======================================================
+       GET BOOK ID
+    ======================================================== */
 
     const params =
       new URLSearchParams(
@@ -341,9 +1284,9 @@
       params.get("id");
 
 
-    // =========================
-    // LOAD BOOK
-    // =========================
+    /* =======================================================
+       LOAD BOOK
+    ======================================================== */
 
     async function loadBook() {
 
@@ -370,7 +1313,9 @@
 
 
         if (error) {
+
           throw error;
+
         }
 
 
@@ -381,24 +1326,22 @@
           );
 
           return;
+
         }
 
 
-        // =========================
-        // BOOK INFORMATION
-        // =========================
-
         titleElement.textContent =
-          book.title || "Untitled";
+          book.title ||
+          "Untitled";
+
 
         authorElement.textContent =
           "By " +
-          (book.author || "Unknown Author");
+          (
+            book.author ||
+            "Unknown Author"
+          );
 
-
-        // =========================
-        // BOOK FILE
-        // =========================
 
         if (!book.book_url) {
 
@@ -407,6 +1350,7 @@
           );
 
           return;
+
         }
 
 
@@ -418,7 +1362,9 @@
 
 
         const response =
-          await fetch(book.book_url);
+          await fetch(
+            book.book_url
+          );
 
 
         if (!response.ok) {
@@ -434,13 +1380,10 @@
           await response.arrayBuffer();
 
 
-        // =========================
-        // DOCX → HTML
-        // =========================
-
         const result =
           await mammoth.convertToHtml({
-            arrayBuffer: arrayBuffer
+            arrayBuffer:
+              arrayBuffer
           });
 
 
@@ -448,14 +1391,11 @@
           result.value;
 
 
-        // =========================
-        // PAGE TITLE
-        // =========================
-
         document.title =
           `${book.title} — OpenShelf`;
 
       }
+
 
       catch (error) {
 
@@ -473,9 +1413,9 @@
     }
 
 
-    // =========================
-    // ERROR
-    // =========================
+    /* =======================================================
+       ERROR
+    ======================================================== */
 
     function showError(message) {
 
@@ -486,25 +1426,35 @@
         "";
 
       contentElement.innerHTML = `
+
         <div class="error-message">
-          <p>${message}</p>
 
           <p>
+            ${message}
+          </p>
+
+          <p>
+
             <button
               class="back-button"
               onclick="window.location.href='index.html'">
+
               ← Return to Library
+
             </button>
+
           </p>
+
         </div>
+
       `;
 
     }
 
 
-    // =========================
-    // READING PROGRESS
-    // =========================
+    /* =======================================================
+       READING PROGRESS
+    ======================================================== */
 
     window.addEventListener(
       "scroll",
@@ -514,13 +1464,17 @@
           window.scrollY;
 
         const documentHeight =
-          document.documentElement.scrollHeight -
+          document.documentElement
+            .scrollHeight -
           window.innerHeight;
 
 
         const progress =
           documentHeight > 0
-            ? (scrollTop / documentHeight) * 100
+            ? (
+                scrollTop /
+                documentHeight
+              ) * 100
             : 0;
 
 
@@ -531,13 +1485,14 @@
     );
 
 
-    // =========================
-    // START
-    // =========================
+    /* =======================================================
+       START
+    ======================================================== */
 
     loadBook();
 
   </script>
 
 </body>
+
 </html>
