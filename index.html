@@ -1,519 +1,260 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenShelf — Community Library</title>
 
-<meta
-  name="description"
-  content="OpenShelf — a community library for discovering and sharing stories."
->
+  <link rel="stylesheet" href="style.css">
 
-<title>OpenShelf — Community Library</title>
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-<link
-  href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap"
-  rel="stylesheet"
->
-
-<link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
+<body>
 
-<body data-theme="light">
+<header class="site-header">
+  <a class="brand" href="index.html">OpenShelf</a>
 
-<header class="topbar">
+  <div class="nav-actions">
+    <button class="theme-button" id="themeButton" type="button">
+      Theme
+    </button>
 
-  <a class="brand" href="#top">
-    <span class="brand-mark">◫</span>
-    <span>OpenShelf</span>
-  </a>
-
-
-  <nav class="main-nav">
-    <a class="active" href="#library">Library</a>
-    <a href="#submit">Submit</a>
-    <a href="#about">About</a>
-  </nav>
-
-
-  <div class="header-actions">
-
-    <!-- THEME PICKER -->
-    <div class="theme-picker">
-
-      <button
-        class="theme-button"
-        id="themeButton"
-        type="button"
-        aria-expanded="false"
-      >
-        <span class="theme-dot"></span>
-        <span>Theme</span>
-        <span>⌄</span>
+    <div class="theme-menu" id="themeMenu">
+      <button class="theme-option" data-theme="light" type="button">
+        Light
       </button>
 
+      <button class="theme-option" data-theme="cozy" type="button">
+        Cozy Library
+      </button>
 
-      <div class="theme-menu" id="themeMenu" hidden>
+      <button class="theme-option" data-theme="cafe" type="button">
+        Café & Books
+      </button>
 
-        <div class="theme-menu-title">
-          Reading atmosphere
-        </div>
-
-
-        <button
-          class="theme-option"
-          data-theme-choice="light"
-          type="button"
-        >
-          <span class="theme-swatch light-swatch"></span>
-
-          <span>
-            <strong>Light</strong>
-            <small>Clean & airy</small>
-          </span>
-
-          <span class="check">✓</span>
-        </button>
-
-
-        <button
-          class="theme-option"
-          data-theme-choice="cozy"
-          type="button"
-        >
-          <span class="theme-swatch cozy-swatch"></span>
-
-          <span>
-            <strong>Cozy Library</strong>
-            <small>Warm & classic</small>
-          </span>
-
-          <span class="check">✓</span>
-        </button>
-
-
-        <button
-          class="theme-option"
-          data-theme-choice="cafe"
-          type="button"
-        >
-          <span class="theme-swatch cafe-swatch"></span>
-
-          <span>
-            <strong>Café & Books</strong>
-            <small>Relaxed & welcoming</small>
-          </span>
-
-          <span class="check">✓</span>
-        </button>
-
-
-        <button
-          class="theme-option"
-          data-theme-choice="editorial"
-          type="button"
-        >
-          <span class="theme-swatch editorial-swatch"></span>
-
-          <span>
-            <strong>Editorial</strong>
-            <small>Elegant & literary</small>
-          </span>
-
-          <span class="check">✓</span>
-        </button>
-
-      </div>
-
+      <button class="theme-option" data-theme="editorial" type="button">
+        Editorial
+      </button>
     </div>
-
-
-    <a class="add-book" href="#submit">
-      + Add a Book
-    </a>
-
   </div>
-
 </header>
 
 
+<main>
 
-<main id="top">
+  <!-- HERO -->
 
+  <section class="hero">
 
-<!-- =========================
-     HERO
-========================= -->
-
-<section class="hero">
-
-  <div class="hero-inner">
-
-    <div class="hero-copy">
+    <div class="hero-content">
 
       <p class="eyebrow">
-        A LIBRARY BUILT BY READERS
+        A community-powered library
       </p>
-
 
       <h1>
-        Stories worth<br>
-        <em>getting lost in.</em>
+        Read something worth remembering.
       </h1>
 
-
-      <p class="hero-text">
-        Discover stories, read chapter by chapter, and share your own books with other readers.
+      <p>
+        Discover books shared by readers and add your own.
       </p>
 
-
-      <div class="hero-actions">
-
-        <a
-          class="button primary"
-          href="#library"
+      <div class="search-wrap">
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search by title, author, or genre..."
+          autocomplete="off"
         >
-          Explore Library <span>→</span>
-        </a>
+      </div>
+
+    </div>
+
+  </section>
 
 
-        <a
-          class="button secondary"
-          href="#submit"
-        >
-          Submit a Book
-        </a>
+  <!-- LIBRARY -->
+
+  <section class="library">
+
+    <div class="section-heading">
+
+      <div>
+        <p class="eyebrow">
+          Library
+        </p>
+
+        <h2>
+          Browse books
+        </h2>
+      </div>
+
+      <div class="library-controls">
+
+        <select id="genreFilter" class="genre-filter">
+          <option value="all">
+            All genres
+          </option>
+        </select>
 
       </div>
 
     </div>
 
 
-    <div class="hero-note">
-      <span></span>
-      READ · DISCOVER · SHARE
-    </div>
-
-  </div>
-
-</section>
+    <div id="bookGrid" class="book-grid"></div>
 
 
+    <div id="emptyState" class="empty-state" hidden>
 
-<!-- =========================
-     SEARCH
-========================= -->
-
-<section class="search-section">
-
-  <div class="search-box">
-
-    <span class="search-symbol">
-      ⌕
-    </span>
-
-
-    <input
-      id="searchInput"
-      type="search"
-      placeholder="Search books, authors, genres..."
-      autocomplete="off"
-    >
-
-
-    <select
-      id="genreFilter"
-      aria-label="Filter by genre"
-    >
-      <option value="all">
-        All Genres
-      </option>
-    </select>
-
-  </div>
-
-</section>
-
-
-
-<!-- =========================
-     LIBRARY
-========================= -->
-
-<section
-  class="library-section"
-  id="library"
->
-
-  <div class="section-heading">
-
-    <div>
-
-      <p class="section-kicker">
-        THE COMMUNITY LIBRARY
-      </p>
-
-      <h2>
-        Books
-      </h2>
-
-    </div>
-
-
-    <span id="resultCount">
-      Loading books...
-    </span>
-
-  </div>
-
-
-  <!-- BOOKS WILL BE LOADED FROM SUPABASE -->
-
-  <div
-    class="book-grid"
-    id="bookGrid"
-  >
-  </div>
-
-
-  <!-- EMPTY STATE -->
-
-  <div
-    class="empty-state"
-    id="emptyState"
-    hidden
-  >
-
-    <div>
-      ⌕
-    </div>
-
-
-    <h3>
-      No books found
-    </h3>
-
-
-    <p>
-      Try a different title, author, or genre.
-    </p>
-
-  </div>
-
-</section>
-
-
-
-<!-- =========================
-     FEATURES
-========================= -->
-
-<section class="feature-strip">
-
-
-  <div class="feature">
-
-    <span class="feature-icon">
-      ◒
-    </span>
-
-    <div>
-
-      <strong>
-        Read chapter by chapter
-      </strong>
+      <h3>
+        No books found
+      </h3>
 
       <p>
-        Pick up where you left off.
+        Try another search or add the first book to the library.
       </p>
 
     </div>
 
-  </div>
+  </section>
 
 
+  <!-- ADD BOOK -->
 
-  <div class="feature">
+  <section class="upload-section">
 
-    <span class="feature-icon">
-      ＋
-    </span>
+    <div class="section-heading">
 
-    <div>
+      <div>
 
-      <strong>
-        Share your stories
-      </strong>
+        <p class="eyebrow">
+          Contribute
+        </p>
 
-      <p>
-        Give your writing a home.
-      </p>
+        <h2>
+          Add a book
+        </h2>
 
-    </div>
-
-  </div>
-
-
-
-  <div class="feature">
-
-    <span class="feature-icon">
-      ⌕
-    </span>
-
-    <div>
-
-      <strong>
-        Find your next read
-      </strong>
-
-      <p>
-        Search by genre, author, or title.
-      </p>
+      </div>
 
     </div>
 
-  </div>
 
-</section>
+    <form id="bookForm" class="upload-form">
 
+      <div class="form-row">
 
+        <label class="form-group">
 
-<!-- =========================
-     SUBMIT BOOK
-========================= -->
+          <span>
+            Title
+          </span>
 
-<section
-  class="content-section"
-  id="submit"
->
+          <input
+            id="bookTitle"
+            type="text"
+            required
+          >
 
-  <div class="content-copy">
-
-    <p class="section-kicker">
-      YOUR STORY BELONGS HERE
-    </p>
+        </label>
 
 
-    <h2>
-      Have a book to share?
-    </h2>
+        <label class="form-group">
+
+          <span>
+            Author
+          </span>
+
+          <input
+            id="bookAuthor"
+            type="text"
+            required
+          >
+
+        </label>
+
+      </div>
 
 
-    <p>
-      Add your book to the OpenShelf community. Upload the book file and its cover so readers can discover it.
-    </p>
+      <div class="form-row">
 
-  </div>
+        <label class="form-group">
+
+          <span>
+            Genre
+          </span>
+
+          <input
+            id="bookGenre"
+            type="text"
+            placeholder="Fiction, Mystery, Science..."
+            required
+          >
+
+        </label>
 
 
+        <label class="form-group">
 
-  <div class="content-card openshelf-form-card">
+          <span>
+            Book file
+          </span>
 
-    <form
-      id="bookForm"
-      class="book-form"
-    >
+          <input
+            id="bookFile"
+            type="file"
+            accept="
+              .pdf,
+              .docx,
+              .epub,
+              .txt,
+              .rtf,
+              application/pdf,
+              application/vnd.openxmlformats-officedocument.wordprocessingml.document,
+              application/epub+zip,
+              text/plain,
+              application/rtf
+            "
+            required
+          >
 
-      <!-- TITLE -->
+        </label>
 
-      <label for="bookTitle">
-        Book title
+      </div>
+
+
+      <label class="form-group">
+
+        <span>
+          Cover image
+        </span>
+
+        <input
+          id="coverFile"
+          type="file"
+          accept="image/*"
+          required
+        >
+
       </label>
 
-      <input
-        id="bookTitle"
-        name="title"
-        type="text"
-        placeholder="Enter the book title"
-        required
-      >
 
+      <p class="file-help">
+        Supported book formats:
+        PDF, DOCX, EPUB, TXT and RTF.
+      </p>
 
-      <!-- AUTHOR -->
-
-      <label for="bookAuthor">
-        Author
-      </label>
-
-      <input
-        id="bookAuthor"
-        name="author"
-        type="text"
-        placeholder="Enter the author's name"
-        required
-      >
-
-
-      <!-- GENRE -->
-
-      <label for="bookGenre">
-        Genre
-      </label>
-
-      <input
-        id="bookGenre"
-        name="genre"
-        type="text"
-        placeholder="e.g. Mystery, Fantasy, Romance"
-        required
-      >
-
-
-      <!-- BOOK FILE -->
-
-      <label for="bookFile">
-        Book file
-      </label>
-
-      <input
-        id="bookFile"
-        name="bookFile"
-        type="file"
-        accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-        required
-      >
-
-      <small>
-        Currently supported: DOCX
-      </small>
-
-
-      <!-- COVER -->
-
-      <label for="coverFile">
-        Cover image
-      </label>
-
-      <input
-        id="coverFile"
-        name="coverFile"
-        type="file"
-        accept="image/*"
-        required
-      >
-
-      <small>
-        JPG, PNG, WEBP and other common image formats
-      </small>
-
-
-      <!-- SUBMIT -->
 
       <button
-        class="button primary"
+        class="submit-book-button"
         type="submit"
-        id="submitBookButton"
       >
-        Add Book <span>→</span>
+        Add to OpenShelf
       </button>
 
-
-      <!-- STATUS -->
 
       <p
         id="uploadStatus"
@@ -523,79 +264,10 @@
 
     </form>
 
-  </div>
-
-</section>
-
-
-
-<!-- =========================
-     ABOUT
-========================= -->
-
-<section
-  class="content-section about"
-  id="about"
->
-
-  <div>
-
-    <p class="section-kicker">
-      ABOUT OPENSHELF
-    </p>
-
-
-    <h2>
-      A small corner<br>
-      for big stories.
-    </h2>
-
-  </div>
-
-
-  <p>
-    OpenShelf is a community-style digital library where readers can discover independent stories and writers can share their work.
-  </p>
-
-</section>
+  </section>
 
 </main>
 
-
-
-<!-- =========================
-     FOOTER
-========================= -->
-
-<footer>
-
-  <div class="footer-brand">
-
-    <span class="brand-mark">
-      ◫
-    </span>
-
-    <strong>
-      OpenShelf
-    </strong>
-
-  </div>
-
-
-  <p>
-    Read something worth remembering.
-  </p>
-
-</footer>
-
-
-
-<!-- SUPABASE -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-<!-- APP -->
 
 <script src="app.js"></script>
 
