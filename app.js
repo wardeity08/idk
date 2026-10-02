@@ -1,120 +1,245 @@
-document.addEventListener("DOMContentLoaded", () => {
-
-  // =========================================================
-  // SUPABASE
-  // =========================================================
-
-  const SUPABASE_URL =
-    "https://kdycmaicayaesnpkqfgp.supabase.co";
-
-  const SUPABASE_PUBLISHABLE_KEY =
-    "sb_publishable_LC_ZkgE8N9p_t6d7KIhC_w_437ZMCFH";
-
-  const supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_PUBLISHABLE_KEY
-    );
+/* =========================================================
+   OPENSHELF
+   Shared library + Supabase
+   Supported formats:
+   PDF / DOCX / EPUB / TXT / RTF
+   ========================================================= */
 
 
-  // =========================================================
-  // THEME SYSTEM
-  // =========================================================
+const SUPABASE_URL =
+  "https://kdycmaicayaesnpkqfgp.supabase.co";
 
-  const themeButton =
-    document.getElementById("themeButton");
-
-  const themeMenu =
-    document.getElementById("themeMenu");
-
-  const themeOptions =
-    document.querySelectorAll(".theme-option");
+const SUPABASE_KEY =
+  "sb_publishable_LC_ZkgE8N9p_t6d7KIhC_w_437ZMCFH";
 
 
-  function setTheme(theme) {
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
 
-    document.body.setAttribute(
-      "data-theme",
-      theme
-    );
 
-    localStorage.setItem(
-      "openshelf-theme",
-      theme
-    );
+/* =========================================================
+   SUPPORTED BOOK FORMATS
+   ========================================================= */
 
-    themeOptions.forEach(option => {
+const SUPPORTED_EXTENSIONS = [
+  ".pdf",
+  ".docx",
+  ".epub",
+  ".txt",
+  ".rtf"
+];
 
-      option.classList.toggle(
-        "selected",
-        option.dataset.themeChoice === theme
+
+function getExtension(filename) {
+
+  const dot =
+    filename.lastIndexOf(".");
+
+  if (dot === -1) {
+    return "";
+  }
+
+  return filename
+    .slice(dot)
+    .toLowerCase();
+
+}
+
+
+function getBookContentType(extension) {
+
+  const types = {
+
+    ".pdf":
+      "application/pdf",
+
+    ".docx":
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+
+    ".epub":
+      "application/epub+zip",
+
+    ".txt":
+      "text/plain",
+
+    ".rtf":
+      "application/rtf"
+
+  };
+
+  return (
+    types[extension] ||
+    "application/octet-stream"
+  );
+
+}
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const searchInput =
+  document.getElementById("searchInput");
+
+const genreFilter =
+  document.getElementById("genreFilter");
+
+const bookGrid =
+  document.getElementById("bookGrid");
+
+const emptyState =
+  document.getElementById("emptyState");
+
+const bookForm =
+  document.getElementById("bookForm");
+
+const uploadStatus =
+  document.getElementById("uploadStatus");
+
+const themeButton =
+  document.getElementById("themeButton");
+
+const themeMenu =
+  document.getElementById("themeMenu");
+
+
+let allBooks = [];
+
+
+/* =========================================================
+   HTML ESCAPING
+   ========================================================= */
+
+function escapeHtml(value = "") {
+
+  return String(value).replace(
+    /[&<>"']/g,
+    character => {
+
+      const map = {
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+
+      };
+
+      return map[character];
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   STATUS
+   ========================================================= */
+
+function showUploadStatus(
+  message,
+  type = ""
+) {
+
+  uploadStatus.textContent =
+    message;
+
+  uploadStatus.className =
+    `upload-status ${type}`.trim();
+
+}
+
+
+/* =========================================================
+   THEMES
+   ========================================================= */
+
+function applyTheme(theme) {
+
+  const allowedThemes = [
+    "light",
+    "cozy",
+    "cafe",
+    "editorial"
+  ];
+
+
+  if (
+    !allowedThemes.includes(theme)
+  ) {
+    theme = "light";
+  }
+
+
+  document.body.dataset.theme =
+    theme;
+
+
+  localStorage.setItem(
+    "openshelf-theme",
+    theme
+  );
+
+
+  document
+    .querySelectorAll(".theme-option")
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.theme === theme
       );
 
     });
 
-  }
+}
 
+
+function initTheme() {
 
   const savedTheme =
-    localStorage.getItem("openshelf-theme") ||
-    "light";
-
-  setTheme(savedTheme);
-
-
-  if (themeButton && themeMenu) {
-
-    themeButton.addEventListener("click", () => {
-
-      const isOpen =
-        !themeMenu.hasAttribute("hidden");
-
-      if (isOpen) {
-
-        themeMenu.setAttribute(
-          "hidden",
-          ""
-        );
-
-        themeButton.setAttribute(
-          "aria-expanded",
-          "false"
-        );
-
-      } else {
-
-        themeMenu.removeAttribute(
-          "hidden"
-        );
-
-        themeButton.setAttribute(
-          "aria-expanded",
-          "true"
-        );
-
-      }
-
-    });
+    localStorage.getItem(
+      "openshelf-theme"
+    ) || "light";
 
 
-    themeOptions.forEach(option => {
+  applyTheme(savedTheme);
 
-      option.addEventListener(
+
+  themeButton?.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      themeMenu.classList.toggle(
+        "open"
+      );
+
+    }
+  );
+
+
+  document
+    .querySelectorAll(".theme-option")
+    .forEach(button => {
+
+      button.addEventListener(
         "click",
         () => {
 
-          setTheme(
-            option.dataset.themeChoice
+          applyTheme(
+            button.dataset.theme
           );
 
-          themeMenu.setAttribute(
-            "hidden",
-            ""
-          );
-
-          themeButton.setAttribute(
-            "aria-expanded",
-            "false"
+          themeMenu.classList.remove(
+            "open"
           );
 
         }
@@ -123,1074 +248,656 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    document.addEventListener(
-      "click",
-      event => {
-
-        if (
-          !themeButton.contains(event.target) &&
-          !themeMenu.contains(event.target)
-        ) {
-
-          themeMenu.setAttribute(
-            "hidden",
-            ""
-          );
-
-          themeButton.setAttribute(
-            "aria-expanded",
-            "false"
-          );
-
-        }
-
-      }
-    );
-
-  }
-
-
-  // =========================================================
-  // ELEMENTS
-  // =========================================================
-
-  const bookGrid =
-    document.getElementById("bookGrid");
-
-  const emptyState =
-    document.getElementById("emptyState");
-
-  const resultCount =
-    document.getElementById("resultCount");
-
-  const searchInput =
-    document.getElementById("searchInput");
-
-  const genreFilter =
-    document.getElementById("genreFilter");
-
-  const bookForm =
-    document.getElementById("bookForm");
-
-  const uploadStatus =
-    document.getElementById("uploadStatus");
-
-  const submitBookButton =
-    document.getElementById("submitBookButton");
-
-
-  // =========================================================
-  // BOOK DATA
-  // =========================================================
-
-  let books = [];
-
-
-  // =========================================================
-  // LOAD BOOKS FROM SUPABASE
-  // =========================================================
-
-  async function loadBooks() {
-
-    if (resultCount) {
-      resultCount.textContent =
-        "Loading books...";
-    }
-
-
-    const {
-      data,
-      error
-    } = await supabaseClient
-      .from("books")
-      .select("*")
-      .order(
-        "created_at",
-        {
-          ascending: false
-        }
-      );
-
-
-    if (error) {
-
-      console.error(
-        "Supabase load error:",
-        error
-      );
-
-      if (resultCount) {
-        resultCount.textContent =
-          "Could not load books";
-      }
-
-      showMessage(
-        "Could not connect to the library. Please refresh the page.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    books = data || [];
-
-
-    buildGenreFilter();
-
-    renderBooks();
-
-  }
-
-
-  // =========================================================
-  // BUILD GENRE FILTER
-  // =========================================================
-
-  function buildGenreFilter() {
-
-    if (!genreFilter) {
-      return;
-    }
-
-
-    const currentValue =
-      genreFilter.value;
-
-
-    const genres =
-      [...new Set(
-        books
-          .map(book => book.genre)
-          .filter(Boolean)
-      )]
-      .sort(
-        (a, b) =>
-          a.localeCompare(b)
-      );
-
-
-    genreFilter.innerHTML = "";
-
-
-    const allOption =
-      document.createElement("option");
-
-    allOption.value = "all";
-    allOption.textContent = "All Genres";
-
-    genreFilter.appendChild(
-      allOption
-    );
-
-
-    genres.forEach(genre => {
-
-      const option =
-        document.createElement("option");
-
-      option.value = genre;
-      option.textContent = genre;
-
-      genreFilter.appendChild(
-        option
-      );
-
-    });
-
-
-    if (
-      genres.includes(currentValue)
-    ) {
-
-      genreFilter.value =
-        currentValue;
-
-    } else {
-
-      genreFilter.value =
-        "all";
-
-    }
-
-  }
-
-
-  // =========================================================
-  // RENDER BOOKS
-  // =========================================================
-
-  function renderBooks() {
-
-    if (!bookGrid) {
-      return;
-    }
-
-
-    const search =
-      searchInput
-        ? searchInput.value
-            .toLowerCase()
-            .trim()
-        : "";
-
-
-    const selectedGenre =
-      genreFilter
-        ? genreFilter.value
-        : "all";
-
-
-    const filteredBooks =
-      books.filter(book => {
-
-        const title =
-          (book.title || "")
-            .toLowerCase();
-
-        const author =
-          (book.author || "")
-            .toLowerCase();
-
-        const genre =
-          (book.genre || "")
-            .toLowerCase();
-
-
-        const matchesSearch =
-          !search ||
-          title.includes(search) ||
-          author.includes(search) ||
-          genre.includes(search);
-
-
-        const matchesGenre =
-          selectedGenre === "all" ||
-          book.genre === selectedGenre;
-
-
-        return (
-          matchesSearch &&
-          matchesGenre
+  document.addEventListener(
+    "click",
+    event => {
+
+      if (
+        !themeMenu.contains(
+          event.target
+        ) &&
+        event.target !== themeButton
+      ) {
+
+        themeMenu.classList.remove(
+          "open"
         );
 
-      });
-
-
-    bookGrid.innerHTML = "";
-
-
-    if (resultCount) {
-
-      resultCount.textContent =
-        `${filteredBooks.length} book${
-          filteredBooks.length === 1
-            ? ""
-            : "s"
-        }`;
-
-    }
-
-
-    if (
-      filteredBooks.length === 0
-    ) {
-
-      if (emptyState) {
-        emptyState.hidden = false;
       }
 
-      return;
-
     }
+  );
+
+}
 
 
-    if (emptyState) {
-      emptyState.hidden = true;
-    }
+/* =========================================================
+   GENRES
+   ========================================================= */
+
+function populateGenres() {
+
+  const genres = [
+    ...new Set(
+
+      allBooks
+        .map(book =>
+          (book.genre || "").trim()
+        )
+        .filter(Boolean)
+
+    )
+  ];
 
 
-    filteredBooks.forEach(book => {
+  genres.sort(
+    (a, b) =>
+      a.localeCompare(b)
+  );
 
-      const card =
-        createBookCard(book);
 
-      bookGrid.appendChild(card);
+  genreFilter.innerHTML =
+    `<option value="all">All genres</option>`;
+
+
+  genres.forEach(genre => {
+
+    const option =
+      document.createElement(
+        "option"
+      );
+
+    option.value = genre;
+    option.textContent = genre;
+
+    genreFilter.appendChild(
+      option
+    );
+
+  });
+
+}
+
+
+/* =========================================================
+   DISPLAY BOOKS
+   ========================================================= */
+
+function renderBooks() {
+
+  const search =
+    (
+      searchInput.value || ""
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const selectedGenre =
+    genreFilter.value;
+
+
+  const filtered =
+    allBooks.filter(book => {
+
+      const matchesSearch =
+        !search ||
+
+        [
+          book.title,
+          book.author,
+          book.genre
+        ]
+          .some(value =>
+            String(value || "")
+              .toLowerCase()
+              .includes(search)
+          );
+
+
+      const matchesGenre =
+        selectedGenre === "all" ||
+
+        String(book.genre || "") ===
+        selectedGenre;
+
+
+      return (
+        matchesSearch &&
+        matchesGenre
+      );
 
     });
 
-  }
+
+  bookGrid.innerHTML = "";
 
 
-  // =========================================================
-  // CREATE BOOK CARD
-  // =========================================================
-
-  function createBookCard(book) {
+  filtered.forEach(book => {
 
     const card =
-      document.createElement("article");
+      document.createElement(
+        "article"
+      );
+
 
     card.className =
       "book-card";
 
 
-    card.dataset.title =
-      book.title || "";
-
-    card.dataset.author =
-      book.author || "";
-
-    card.dataset.genre =
-      book.genre || "";
+    card.tabIndex = 0;
 
 
-    // Make the WHOLE card clickable
+    const cover =
+      book.cover_url
+
+        ? `
+          <img
+            src="${escapeHtml(book.cover_url)}"
+            alt="${escapeHtml(book.title)} cover"
+            loading="lazy"
+          >
+        `
+
+        : `
+          <div class="book-cover-placeholder">
+            No cover
+          </div>
+        `;
+
+
+    card.innerHTML = `
+
+      <div class="book-cover">
+        ${cover}
+      </div>
+
+      <div class="book-card-info">
+
+        <p class="book-genre">
+          ${escapeHtml(
+            book.genre ||
+            "Uncategorized"
+          )}
+        </p>
+
+        <h3>
+          ${escapeHtml(
+            book.title ||
+            "Untitled"
+          )}
+        </h3>
+
+        <p class="book-author">
+          ${escapeHtml(
+            book.author ||
+            "Unknown author"
+          )}
+        </p>
+
+      </div>
+
+    `;
+
+
+    function openBook() {
+
+      window.location.href =
+        `reader.html?id=${encodeURIComponent(
+          book.id
+        )}`;
+
+    }
+
 
     card.addEventListener(
       "click",
-      () => {
+      openBook
+    );
 
-        openBook(book);
+
+    card.addEventListener(
+      "keydown",
+      event => {
+
+        if (
+          event.key === "Enter" ||
+          event.key === " "
+        ) {
+
+          event.preventDefault();
+
+          openBook();
+
+        }
 
       }
     );
 
 
-    // =======================================================
-    // COVER
-    // =======================================================
+    bookGrid.appendChild(card);
 
-    const cover =
-      document.createElement("div");
-
-    cover.className =
-      "book-cover uploaded-cover";
+  });
 
 
-    if (book.cover_url) {
+  emptyState.hidden =
+    filtered.length !== 0;
 
-      const image =
-        document.createElement("img");
-
-      image.src =
-        book.cover_url;
-
-      image.alt =
-        `${book.title || "Book"} cover`;
-
-      image.loading = "lazy";
+}
 
 
-      image.onerror = () => {
+/* =========================================================
+   LOAD SHARED LIBRARY
+   ========================================================= */
 
-        cover.classList.add(
-          "cover-fallback"
-        );
+async function loadBooks() {
 
-        image.remove();
-
-        createCoverFallback(
-          cover,
-          book
-        );
-
-      };
+  bookGrid.innerHTML =
+    `<p class="loading-message">
+      Loading library...
+    </p>`;
 
 
-      cover.appendChild(
-        image
-      );
-
-    } else {
-
-      createCoverFallback(
-        cover,
-        book
-      );
-
-    }
-
-
-    // =======================================================
-    // BOOK INFO
-    // =======================================================
-
-    const info =
-      document.createElement("div");
-
-    info.className =
-      "book-info";
-
-
-    const genre =
-      document.createElement("span");
-
-    genre.className =
-      "book-genre";
-
-    genre.textContent =
-      book.genre || "Book";
-
-
-    const title =
-      document.createElement("h3");
-
-    title.textContent =
-      book.title || "Untitled";
-
-
-    const author =
-      document.createElement("p");
-
-    author.textContent =
-      `by ${book.author || "Unknown author"}`;
-
-
-    info.appendChild(
-      genre
-    );
-
-    info.appendChild(
-      title
-    );
-
-    info.appendChild(
-      author
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from("books")
+    .select("*")
+    .order(
+      "created_at",
+      {
+        ascending: false
+      }
     );
 
 
-    // =======================================================
-    // ARROW
-    // =======================================================
+  if (error) {
 
-    const arrow =
-      document.createElement("span");
+    console.error(error);
 
-    arrow.className =
-      "card-arrow";
+    bookGrid.innerHTML = "";
 
-    arrow.textContent =
-      "↗";
+    emptyState.hidden = false;
 
-    arrow.setAttribute(
-      "aria-hidden",
-      "true"
-    );
+    emptyState.innerHTML = `
 
+      <h3>
+        Could not load the library
+      </h3>
 
-    card.appendChild(
-      cover
-    );
+      <p>
+        ${escapeHtml(
+          error.message
+        )}
+      </p>
 
-    card.appendChild(
-      info
-    );
+    `;
 
-    card.appendChild(
-      arrow
-    );
-
-
-    return card;
+    return;
 
   }
 
 
-  // =========================================================
-  // FALLBACK COVER
-  // =========================================================
+  allBooks =
+    data || [];
 
-  function createCoverFallback(
-    cover,
-    book
+
+  populateGenres();
+
+  renderBooks();
+
+}
+
+
+/* =========================================================
+   UPLOAD BOOK
+   ========================================================= */
+
+async function uploadBook(event) {
+
+  event.preventDefault();
+
+
+  const title =
+    document
+      .getElementById("bookTitle")
+      .value
+      .trim();
+
+
+  const author =
+    document
+      .getElementById("bookAuthor")
+      .value
+      .trim();
+
+
+  const genre =
+    document
+      .getElementById("bookGenre")
+      .value
+      .trim();
+
+
+  const bookFile =
+    document
+      .getElementById("bookFile")
+      .files[0];
+
+
+  const coverFile =
+    document
+      .getElementById("coverFile")
+      .files[0];
+
+
+  if (
+    !title ||
+    !author ||
+    !genre ||
+    !bookFile ||
+    !coverFile
   ) {
 
-    const label =
-      document.createElement("span");
-
-    label.className =
-      "cover-label";
-
-    label.textContent =
-      (book.genre || "BOOK")
-        .toUpperCase();
-
-
-    const title =
-      document.createElement("span");
-
-    title.className =
-      "cover-title";
-
-    title.textContent =
-      book.title || "Untitled";
-
-
-    cover.appendChild(
-      label
+    showUploadStatus(
+      "Please fill in every field.",
+      "error"
     );
 
-    cover.appendChild(
-      title
-    );
+    return;
 
   }
 
 
-  // =========================================================
-  // OPEN BOOK
-  // =========================================================
+  /* Check book extension */
 
-  function openBook(book) {
-
-    if (
-      !book ||
-      !book.id
-    ) {
-      return;
-    }
-
-
-    window.location.href =
-      `reader.html?id=${encodeURIComponent(book.id)}`;
-
-  }
-
-
-  window.openBook =
-    openBook;
-
-
-  // =========================================================
-  // SEARCH
-  // =========================================================
-
-  if (searchInput) {
-
-    searchInput.addEventListener(
-      "input",
-      renderBooks
-    );
-
-  }
-
-
-  if (genreFilter) {
-
-    genreFilter.addEventListener(
-      "change",
-      renderBooks
-    );
-
-  }
-
-
-  // =========================================================
-  // UPLOAD BOOK
-  // =========================================================
-
-  if (bookForm) {
-
-    bookForm.addEventListener(
-      "submit",
-      handleBookUpload
-    );
-
-  }
-
-
-  async function handleBookUpload(event) {
-
-    event.preventDefault();
-
-
-    const titleInput =
-      document.getElementById("bookTitle");
-
-    const authorInput =
-      document.getElementById("bookAuthor");
-
-    const genreInput =
-      document.getElementById("bookGenre");
-
-    const bookFileInput =
-      document.getElementById("bookFile");
-
-    const coverFileInput =
-      document.getElementById("coverFile");
-
-
-    const title =
-      titleInput.value.trim();
-
-    const author =
-      authorInput.value.trim();
-
-    const genre =
-      genreInput.value.trim();
-
-    const bookFile =
-      bookFileInput.files[0];
-
-    const coverFile =
-      coverFileInput.files[0];
-
-
-    // =======================================================
-    // VALIDATION
-    // =======================================================
-
-    if (
-      !title ||
-      !author ||
-      !genre ||
-      !bookFile ||
-      !coverFile
-    ) {
-
-      showMessage(
-        "Please fill in every field.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    const fileName =
-      bookFile.name.toLowerCase();
-
-
-    if (
-      !fileName.endsWith(".docx")
-    ) {
-
-      showMessage(
-        "Please upload a DOCX book file.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    if (
-      !coverFile.type.startsWith("image/")
-    ) {
-
-      showMessage(
-        "Please upload an image for the cover.",
-        "error"
-      );
-
-      return;
-
-    }
-
-
-    // =======================================================
-    // START UPLOAD
-    // =======================================================
-
-    if (submitBookButton) {
-
-      submitBookButton.disabled =
-        true;
-
-      submitBookButton.innerHTML =
-        "Uploading...";
-
-    }
-
-
-    showMessage(
-      "Uploading your book...",
-      "loading"
+  const extension =
+    getExtension(
+      bookFile.name
     );
 
 
-    try {
-
-      // -----------------------------------------------------
-      // UNIQUE FILE NAMES
-      // -----------------------------------------------------
-
-      const uniqueId =
-        `${Date.now()}-${Math.random()
-          .toString(36)
-          .substring(2, 10)}`;
-
-
-      const safeBookName =
-        sanitizeFileName(
-          bookFile.name
-        );
-
-
-      const safeCoverName =
-        sanitizeFileName(
-          coverFile.name
-        );
-
-
-      const bookPath =
-        `${uniqueId}-${safeBookName}`;
-
-
-      const coverPath =
-        `${uniqueId}-${safeCoverName}`;
-
-
-      // -----------------------------------------------------
-      // UPLOAD BOOK FILE
-      // -----------------------------------------------------
-
-      showMessage(
-        "Uploading book file...",
-        "loading"
-      );
-
-
-      const {
-        error: bookUploadError
-      } =
-        await supabaseClient
-          .storage
-          .from("book_file")
-          .upload(
-            bookPath,
-            bookFile,
-            {
-              cacheControl: "3600",
-              upsert: false,
-              contentType:
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-            }
-          );
-
-
-      if (bookUploadError) {
-
-        throw new Error(
-          `Book upload failed: ${bookUploadError.message}`
-        );
-
-      }
-
-
-      // -----------------------------------------------------
-      // UPLOAD COVER
-      // -----------------------------------------------------
-
-      showMessage(
-        "Uploading cover...",
-        "loading"
-      );
-
-
-      const {
-        error: coverUploadError
-      } =
-        await supabaseClient
-          .storage
-          .from("book-covers")
-          .upload(
-            coverPath,
-            coverFile,
-            {
-              cacheControl: "3600",
-              upsert: false,
-              contentType:
-                coverFile.type
-            }
-          );
-
-
-      if (coverUploadError) {
-
-        throw new Error(
-          `Cover upload failed: ${coverUploadError.message}`
-        );
-
-      }
-
-
-      // -----------------------------------------------------
-      // GET PUBLIC URLs
-      // -----------------------------------------------------
-
-      const {
-        data: bookPublicData
-      } =
-        supabaseClient
-          .storage
-          .from("book_file")
-          .getPublicUrl(
-            bookPath
-          );
-
-
-      const {
-        data: coverPublicData
-      } =
-        supabaseClient
-          .storage
-          .from("book-covers")
-          .getPublicUrl(
-            coverPath
-          );
-
-
-      const bookUrl =
-        bookPublicData.publicUrl;
-
-
-      const coverUrl =
-        coverPublicData.publicUrl;
-
-
-      // -----------------------------------------------------
-      // SAVE BOOK TO DATABASE
-      // -----------------------------------------------------
-
-      showMessage(
-        "Saving book to the library...",
-        "loading"
-      );
-
-
-      const {
-        error: databaseError
-      } =
-        await supabaseClient
-          .from("books")
-          .insert([
-            {
-              title: title,
-              author: author,
-              genre: genre,
-              book_url: bookUrl,
-              cover_url: coverUrl
-            }
-          ]);
-
-
-      if (databaseError) {
-
-        throw new Error(
-          `Database error: ${databaseError.message}`
-        );
-
-      }
-
-
-      // -----------------------------------------------------
-      // SUCCESS
-      // -----------------------------------------------------
-
-      showMessage(
-        "Book added successfully! 🎉",
-        "success"
-      );
-
-
-      bookForm.reset();
-
-
-      await loadBooks();
-
-
-      setTimeout(
-        () => {
-
-          const library =
-            document.getElementById(
-              "library"
-            );
-
-          if (library) {
-
-            library.scrollIntoView({
-              behavior: "smooth"
-            });
-
-          }
-
-        },
-        800
-      );
-
-
-    } catch (error) {
-
-      console.error(
-        "Upload error:",
-        error
-      );
-
-
-      showMessage(
-        error.message ||
-        "Something went wrong while uploading the book.",
-        "error"
-      );
-
-
-    } finally {
-
-      if (submitBookButton) {
-
-        submitBookButton.disabled =
-          false;
-
-        submitBookButton.innerHTML =
-          "Add Book <span>→</span>";
-
-      }
-
-    }
-
-  }
-
-
-  // =========================================================
-  // STATUS MESSAGE
-  // =========================================================
-
-  function showMessage(
-    message,
-    type
+  if (
+    !SUPPORTED_EXTENSIONS.includes(
+      extension
+    )
   ) {
 
-    if (!uploadStatus) {
-      return;
-    }
+    showUploadStatus(
+      "Supported formats: PDF, DOCX, EPUB, TXT and RTF.",
+      "error"
+    );
 
-
-    uploadStatus.textContent =
-      message;
-
-
-    uploadStatus.dataset.status =
-      type;
+    return;
 
   }
 
 
-  // =========================================================
-  // FILE NAME CLEANER
-  // =========================================================
+  /* Check cover */
 
-  function sanitizeFileName(
-    fileName
+  if (
+    !coverFile.type.startsWith(
+      "image/"
+    )
   ) {
 
-    return fileName
+    showUploadStatus(
+      "The cover must be an image.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  /* Create safe filenames */
+
+  const safeBase =
+    bookFile.name
       .replace(
-        /[^a-zA-Z0-9._-]/g,
+        /\.[^/.]+$/,
+        ""
+      )
+      .replace(
+        /[^a-zA-Z0-9-_]+/g,
         "-"
       )
       .replace(
         /-+/g,
         "-"
-      );
-
-  }
-
-
-  // =========================================================
-  // EXPLORE LIBRARY
-  // =========================================================
-
-  const exploreButton =
-    document.getElementById(
-      "exploreButton"
-    );
+      )
+      .replace(
+        /^-|-$/g,
+        ""
+      )
+      .slice(
+        0,
+        80
+      ) ||
+    "book";
 
 
-  if (exploreButton) {
-
-    exploreButton.addEventListener(
-      "click",
-      () => {
-
-        const library =
-          document.getElementById(
-            "library"
-          );
-
-        if (library) {
-
-          library.scrollIntoView({
-            behavior: "smooth"
-          });
-
-        }
-
-      }
-    );
-
-  }
+  const uniqueId =
+    `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 9)}`;
 
 
-  // =========================================================
-  // NAVIGATION
-  // =========================================================
+  const bookPath =
+    `${uniqueId}-${safeBase}${extension}`;
 
-  document
-    .querySelectorAll(
-      'a[href^="#"]'
+
+  const coverExtension =
+    (
+      coverFile.name
+        .split(".")
+        .pop() ||
+      "jpg"
     )
-    .forEach(link => {
-
-      link.addEventListener(
-        "click",
-        event => {
-
-          const targetId =
-            link.getAttribute(
-              "href"
-            );
+      .toLowerCase()
+      .replace(
+        /[^a-z0-9]/g,
+        ""
+      ) ||
+    "jpg";
 
 
-          if (
-            !targetId ||
-            targetId === "#"
-          ) {
-            return;
-          }
+  const coverPath =
+    `${uniqueId}-cover.${coverExtension}`;
 
 
-          const target =
-            document.querySelector(
-              targetId
-            );
+  try {
+
+    /* -----------------------------------------
+       BOOK FILE
+       ----------------------------------------- */
+
+    showUploadStatus(
+      "Uploading book file..."
+    );
 
 
-          if (target) {
+    const {
+      error: bookUploadError
+    } = await supabaseClient
+      .storage
+      .from("book_file")
+      .upload(
+        bookPath,
+        bookFile,
+        {
+          contentType:
+            getBookContentType(
+              extension
+            ),
 
-            event.preventDefault();
-
-            target.scrollIntoView({
-              behavior: "smooth"
-            });
-
-          }
-
+          upsert: false
         }
       );
 
+
+    if (bookUploadError) {
+      throw bookUploadError;
+    }
+
+
+    /* -----------------------------------------
+       COVER
+       ----------------------------------------- */
+
+    showUploadStatus(
+      "Uploading cover..."
+    );
+
+
+    const {
+      error: coverUploadError
+    } = await supabaseClient
+      .storage
+      .from("book-covers")
+      .upload(
+        coverPath,
+        coverFile,
+        {
+          contentType:
+            coverFile.type,
+
+          upsert: false
+        }
+      );
+
+
+    if (coverUploadError) {
+      throw coverUploadError;
+    }
+
+
+    /* -----------------------------------------
+       PUBLIC URLS
+       ----------------------------------------- */
+
+    const {
+      data: bookPublic
+    } = supabaseClient
+      .storage
+      .from("book_file")
+      .getPublicUrl(
+        bookPath
+      );
+
+
+    const {
+      data: coverPublic
+    } = supabaseClient
+      .storage
+      .from("book-covers")
+      .getPublicUrl(
+        coverPath
+      );
+
+
+    /* -----------------------------------------
+       DATABASE ROW
+       ----------------------------------------- */
+
+    showUploadStatus(
+      "Adding book to shared library..."
+    );
+
+
+    const {
+      error: insertError
+    } = await supabaseClient
+      .from("books")
+      .insert({
+
+        title,
+        author,
+        genre,
+
+        book_url:
+          bookPublic.publicUrl,
+
+        cover_url:
+          coverPublic.publicUrl
+
+      });
+
+
+    if (insertError) {
+      throw insertError;
+    }
+
+
+    /* SUCCESS */
+
+    showUploadStatus(
+      "Book added successfully.",
+      "success"
+    );
+
+
+    bookForm.reset();
+
+
+    await loadBooks();
+
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
     });
 
 
-  // =========================================================
-  // INITIAL LOAD
-  // =========================================================
+  } catch (error) {
 
-  loadBooks();
+    console.error(
+      "UPLOAD ERROR:",
+      error
+    );
 
-});
+
+    showUploadStatus(
+      `Upload failed: ${
+        error.message ||
+        "Unknown error"
+      }`,
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   EVENTS
+   ========================================================= */
+
+searchInput?.addEventListener(
+  "input",
+  renderBooks
+);
+
+
+genreFilter?.addEventListener(
+  "change",
+  renderBooks
+);
+
+
+bookForm?.addEventListener(
+  "submit",
+  uploadBook
+);
+
+
+/* =========================================================
+   START
+   ========================================================= */
+
+initTheme();
+
+loadBooks();
