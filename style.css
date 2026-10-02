@@ -1,0 +1,332 @@
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: #f5f1e8;
+  color: #20201d;
+  font-family: Arial, sans-serif;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* NAVBAR */
+
+header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(245, 241, 232, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid #ddd6c9;
+}
+
+.nav {
+  max-width: 1150px;
+  height: 72px;
+  margin: auto;
+  padding: 0 20px;
+
+  display: flex;
+  align-items: center;
+  gap: 35px;
+}
+
+.logo {
+  font-weight: bold;
+  font-size: 18px;
+}
+
+nav {
+  display: flex;
+  gap: 25px;
+  margin-right: auto;
+}
+
+nav a {
+  color: #77736a;
+  font-size: 14px;
+}
+
+nav a:hover {
+  color: #b64d35;
+}
+
+.button,
+.main-button {
+  background: #20201d;
+  color: white;
+  padding: 11px 18px;
+  border-radius: 30px;
+  font-size: 13px;
+  font-weight: bold;
+}
+
+/* HERO */
+
+.hero {
+  max-width: 1150px;
+  min-height: 600px;
+  margin: auto;
+  padding: 70px 20px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: 50px;
+}
+
+.eyebrow {
+  color: #b64d35;
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 3px;
+}
+
+.hero h1 {
+  font-family: Georgia, serif;
+  font-size: clamp(55px, 7vw, 85px);
+  line-height: 0.98;
+  letter-spacing: -4px;
+  margin: 15px 0;
+}
+
+.hero h1 span {
+  color: #b64d35;
+  font-weight: normal;
+}
+
+.description {
+  color: #77736a;
+  max-width: 500px;
+  font-size: 16px;
+  line-height: 1.8;
+  margin-bottom: 30px;
+}
+
+/* BOOK DISPLAY */
+
+.books-art {
+  height: 420px;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.book {
+  position: absolute;
+  width: 170px;
+  height: 250px;
+
+  padding: 20px;
+
+  display: flex;
+  align-items: flex-end;
+
+  color: white;
+
+  font-family: Georgia, serif;
+  font-size: 22px;
+  font-weight: bold;
+
+  border-radius: 5px 12px 12px 5px;
+
+  box-shadow: 15px 20px 35px rgba(0, 0, 0, 0.2);
+}
+
+.book-one {
+  background: #b64d35;
+  transform: rotate(-9deg);
+  margin-left: -100px;
+}
+
+.book-two {
+  background: #35444f;
+  transform: rotate(7deg);
+  margin-left: 90px;
+}
+
+.book-three {
+  background: #56634d;
+  z-index: 3;
+}
+
+/* LIBRARY */
+
+.library,
+.about {
+  max-width: 1150px;
+  margin: auto;
+  padding: 80px 20px;
+  border-top: 1px solid #ddd6c9;
+}
+
+.library h2,
+.about h2 {
+  font-family: Georgia, serif;
+  font-size: 52px;
+  letter-spacing: -2px;
+  margin-top: 10px;
+}
+
+#search {
+  width: 330px;
+  padding: 14px 18px;
+
+  border: 1px solid #ddd6c9;
+  border-radius: 30px;
+
+  background: #fffdf8;
+  outline: none;
+
+  margin: 10px 0 30px;
+}
+
+/* BOOK GRID */
+
+.book-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
+}
+
+.card {
+  background: #fffdf8;
+  border: 1px solid #ddd6c9;
+  border-radius: 16px;
+  padding: 12px;
+  transition: 0.25s;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.12);
+}
+
+.cover {
+  height: 240px;
+  border-radius: 10px;
+
+  padding: 20px;
+
+  display: flex;
+  align-items: flex-end;
+
+  color: white;
+
+  font-family: Georgia, serif;
+  font-size: 27px;
+  font-weight: bold;
+}
+
+.mystery {
+  background: linear-gradient(145deg, #454d55, #17191b);
+}
+
+.fantasy {
+  background: linear-gradient(145deg, #708060, #252e28);
+}
+
+.scifi {
+  background: linear-gradient(145deg, #62798d, #171d27);
+}
+
+.card-info {
+  padding: 15px 8px 8px;
+}
+
+.genre {
+  font-size: 10px;
+  color: #b64d35;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.card h3 {
+  font-family: Georgia, serif;
+  font-size: 23px;
+  margin: 7px 0;
+}
+
+.card p {
+  color: #77736a;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.read {
+  display: inline-block;
+  margin-top: 10px;
+
+  background: #b64d35;
+  color: white;
+
+  padding: 10px 15px;
+  border-radius: 8px;
+
+  font-size: 12px;
+}
+
+/* ABOUT */
+
+.about {
+  text-align: center;
+}
+
+.about p:last-child {
+  max-width: 600px;
+  margin: auto;
+  color: #77736a;
+  line-height: 1.8;
+}
+
+/* FOOTER */
+
+footer {
+  max-width: 1150px;
+  margin: auto;
+  padding: 40px 20px 60px;
+
+  border-top: 1px solid #ddd6c9;
+
+  display: flex;
+  justify-content: space-between;
+
+  color: #77736a;
+  font-size: 12px;
+}
+
+/* MOBILE */
+
+@media (max-width: 800px) {
+
+  nav,
+  .button {
+    display: none;
+  }
+
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .book-grid {
+    grid-template-columns: 1fr;
+  }
+
+  #search {
+    width: 100%;
+  }
+
+  footer {
+    flex-direction: column;
+    gap: 15px;
+  }
+}
