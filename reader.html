@@ -2,87 +2,303 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
   <title>OpenShelf Reader</title>
 
-  <link rel="stylesheet" href="style.css">
-
   <style>
-    .reader {
-      max-width: 850px;
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      margin: 0;
+      background: #0d0d0f;
+      color: #eee9df;
+      font-family: Arial, sans-serif;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    header {
+      border-bottom: 1px solid #29292e;
+      background: #0d0d0f;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .nav {
+      max-width: 1000px;
+      height: 70px;
       margin: auto;
-      padding: 80px 20px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
 
-    .reader-box {
-      background: #fffdf8;
-      border: 1px solid #ddd6c9;
-      border-radius: 18px;
-      padding: 60px;
-      box-shadow: 0 20px 60px rgba(0,0,0,.08);
-    }
-
-    .reader h1 {
+    .logo {
       font-family: Georgia, serif;
-      font-size: 55px;
-      line-height: 1;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .back {
+      color: #aaa6ad;
+      font-size: 13px;
+    }
+
+    .back:hover {
+      color: #c76a50;
+    }
+
+    .reader {
+      max-width: 820px;
+      margin: auto;
+      padding: 70px 20px 100px;
+    }
+
+    .book-info {
+      text-align: center;
+      margin-bottom: 60px;
+    }
+
+    .genre {
+      color: #c76a50;
+      font-size: 10px;
+      letter-spacing: 3px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      font-family: Georgia, serif;
+      font-size: clamp(42px, 7vw, 70px);
+      margin: 15px 0;
+      letter-spacing: -2px;
     }
 
     .author {
-      color: #77736a;
+      color: #929096;
+      font-size: 14px;
     }
 
-    .story {
-      margin-top: 50px;
-      font-family: Georgia, serif;
-      font-size: 19px;
-      line-height: 2;
-      white-space: pre-line;
-      color: #37352f;
+    .progress-box {
+      margin: 30px auto;
+      max-width: 500px;
+    }
+
+    .progress-bar {
+      height: 5px;
+      background: #29292e;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: #c76a50;
+      transition: width 0.3s;
+    }
+
+    .progress-text {
+      color: #77747a;
+      font-size: 11px;
+      margin-top: 8px;
     }
 
     .controls {
-      margin-top: 50px;
-      padding-top: 25px;
-      border-top: 1px solid #ddd6c9;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin: 30px 0;
+      flex-wrap: wrap;
+    }
 
+    select,
+    button {
+      background: #17171a;
+      color: #eee9df;
+      border: 1px solid #35353a;
+      border-radius: 8px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    button:hover {
+      border-color: #c76a50;
+    }
+
+    .chapter {
+      border-top: 1px solid #29292e;
+      padding-top: 45px;
+    }
+
+    .chapter h2 {
+      font-family: Georgia, serif;
+      font-size: 35px;
+      margin-bottom: 30px;
+    }
+
+    .chapter p {
+      color: #c4c0c5;
+      font-family: Georgia, serif;
+      font-size: 18px;
+      line-height: 2;
+      margin: 0 0 25px;
+    }
+
+    .chapter-navigation {
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      margin-top: 60px;
+      gap: 15px;
     }
 
-    .controls button {
-      padding: 10px 18px;
-      border: 1px solid #ddd6c9;
-      background: transparent;
-      border-radius: 8px;
+    .chapter-navigation button {
+      padding: 13px 20px;
+    }
+
+    .complete-box {
+      display: none;
+      margin-top: 70px;
+      padding: 35px;
+      background: #151518;
+      border: 1px solid #29292e;
+      border-radius: 15px;
+      text-align: center;
+    }
+
+    .complete-box.show {
+      display: block;
+    }
+
+    .complete-box h2 {
+      font-family: Georgia, serif;
+      margin-top: 0;
+    }
+
+    .complete-box p {
+      color: #929096;
+      font-size: 14px;
+    }
+
+    .stars {
+      display: flex;
+      justify-content: center;
+      gap: 7px;
+      margin: 25px 0;
+    }
+
+    .star {
+      font-size: 30px;
+      color: #555;
       cursor: pointer;
+      border: none;
+      background: none;
+      padding: 0;
     }
 
-    .controls button:hover {
-      background: #20201d;
-      color: white;
+    .star.active {
+      color: #c76a50;
     }
 
-    #chapterSelect {
-      margin-top: 25px;
-      padding: 10px;
-      border: 1px solid #ddd6c9;
+    .rating-message {
+      color: #929096;
+      font-size: 13px;
+    }
+
+    .comments {
+      margin-top: 50px;
+      text-align: left;
+    }
+
+    .comments h3 {
+      font-family: Georgia, serif;
+      font-size: 28px;
+    }
+
+    .comment-form {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .comment-form input,
+    .comment-form textarea {
+      width: 100%;
+      padding: 13px;
+      background: #0d0d0f;
+      border: 1px solid #303035;
       border-radius: 8px;
-      background: white;
+      color: #eee9df;
+      outline: none;
+      font-family: Arial, sans-serif;
     }
 
-    @media(max-width:600px) {
-      .reader-box {
-        padding: 30px;
+    .comment-form textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    .comment-form button {
+      background: #c76a50;
+      border: none;
+      color: white;
+      font-weight: bold;
+    }
+
+    .comment {
+      margin-top: 20px;
+      padding: 18px;
+      background: #101013;
+      border: 1px solid #29292e;
+      border-radius: 10px;
+    }
+
+    .comment strong {
+      color: #eee9df;
+    }
+
+    .comment p {
+      color: #aaa6ad;
+      line-height: 1.6;
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 600px) {
+
+      .reader {
+        padding-top: 45px;
       }
 
-      .reader h1 {
-        font-size: 40px;
+      .chapter p {
+        font-size: 17px;
       }
+
+      .complete-box {
+        padding: 25px;
+      }
+
     }
+
   </style>
 
 </head>
@@ -90,16 +306,20 @@
 
 <body>
 
+
 <header>
 
   <div class="nav">
 
-    <a class="logo" href="index.html">
+    <div class="logo">
       📖 OpenShelf
-    </a>
+    </div>
 
-    <a href="index.html">
-      ← Back to library
+    <a
+      class="back"
+      href="index.html"
+    >
+      ← Back to Library
     </a>
 
   </div>
@@ -109,40 +329,192 @@
 
 <main class="reader">
 
-  <div class="reader-box">
 
-    <p class="eyebrow" id="genre"></p>
+  <section class="book-info">
 
-    <h1 id="title"></h1>
+    <div
+      id="genre"
+      class="genre"
+    >
+      BOOK
+    </div>
 
-    <p class="author" id="author"></p>
+    <h1 id="bookTitle">
+      Loading...
+    </h1>
+
+    <div
+      id="author"
+      class="author"
+    >
+      Loading...
+    </div>
+
+
+    <div class="progress-box">
+
+      <div class="progress-bar">
+
+        <div
+          id="progress"
+          class="progress"
+        ></div>
+
+      </div>
+
+      <div
+        id="progressText"
+        class="progress-text"
+      >
+        Chapter 1
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <div class="controls">
 
     <select id="chapterSelect"></select>
 
-    <h2 id="chapterTitle"></h2>
+  </div>
 
-    <div class="story" id="story"></div>
 
-    <div class="controls">
+  <article class="chapter">
 
-      <button onclick="previousChapter()">
+    <h2 id="chapterTitle">
+      Loading...
+    </h2>
+
+    <div id="chapterContent"></div>
+
+
+    <div class="chapter-navigation">
+
+      <button id="previousButton">
         ← Previous
       </button>
 
-      <span id="chapterNumber"></span>
-
-      <button onclick="nextChapter()">
+      <button id="nextButton">
         Next →
       </button>
 
     </div>
 
-  </div>
+  </article>
+
+
+  <section
+    id="completeBox"
+    class="complete-box"
+  >
+
+    <h2>
+      You finished the book.
+    </h2>
+
+    <p>
+      What did you think?
+    </p>
+
+
+    <div
+      id="stars"
+      class="stars"
+    >
+
+      <button
+        class="star"
+        data-rating="1"
+      >
+        ★
+      </button>
+
+      <button
+        class="star"
+        data-rating="2"
+      >
+        ★
+      </button>
+
+      <button
+        class="star"
+        data-rating="3"
+      >
+        ★
+      </button>
+
+      <button
+        class="star"
+        data-rating="4"
+      >
+        ★
+      </button>
+
+      <button
+        class="star"
+        data-rating="5"
+      >
+        ★
+      </button>
+
+    </div>
+
+
+    <div
+      id="ratingMessage"
+      class="rating-message"
+    >
+      Choose a rating.
+    </div>
+
+
+    <div class="comments">
+
+      <h3>
+        Comments
+      </h3>
+
+      <form
+        id="commentForm"
+        class="comment-form"
+      >
+
+        <input
+          id="commentName"
+          type="text"
+          placeholder="Your name"
+          required
+        >
+
+        <textarea
+          id="commentText"
+          placeholder="What did you think about the book?"
+          required
+        ></textarea>
+
+        <button type="submit">
+          Post Comment
+        </button>
+
+      </form>
+
+
+      <div id="commentsList"></div>
+
+    </div>
+
+  </section>
+
 
 </main>
 
 
 <script>
+
+
+/* BOOK DATA */
 
 const books = {
 
@@ -157,49 +529,36 @@ const books = {
     chapters: [
 
       {
-        title: "Chapter One — Platform 6",
+        title: "The Empty Station",
 
-        text: `The station clock had stopped at 11:47.
+        content: [
+          "The station was almost empty when the final train arrived.",
+          "Only one passenger was waiting on the platform.",
+          "Something about the silence felt wrong."
+        ]
 
-Mara stepped onto Platform 6 with a suitcase and a letter.
-
-The letter contained only one sentence:
-
-Do not take the last train home.
-
-The rails began to hum in the distance.
-
-A train was coming.`
       },
 
       {
-        title: "Chapter Two — The Empty Carriage",
+        title: "The Missing Passenger",
 
-        text: `The doors opened without a sound.
+        content: [
+          "The train stopped, but nobody stepped onto the platform.",
+          "The conductor checked the passenger list again.",
+          "One name was there that nobody remembered seeing."
+        ]
 
-Every seat was empty except one.
-
-On it sat a black notebook.
-
-Mara picked it up.
-
-The first page contained a list of names.
-
-Four had been crossed out.
-
-The fifth was hers.`
       },
 
       {
-        title: "Chapter Three — 11:47",
+        title: "The Final Train",
 
-        text: `Mara looked at the station clock.
+        content: [
+          "By midnight, the mystery had finally begun to make sense.",
+          "The last train was not carrying a passenger.",
+          "It was carrying a secret."
+        ]
 
-It still said 11:47.
-
-Then the train lights went out.
-
-Someone whispered her name from the end of the carriage.`
       }
 
     ]
@@ -218,37 +577,36 @@ Someone whispered her name from the end of the carriage.`
     chapters: [
 
       {
-        title: "Chapter One — The Door",
+        title: "Midnight",
 
-        text: `At midnight, the house appeared at the end of the road.
+        content: [
+          "The house appeared at exactly midnight.",
+          "Nobody knew where it came from.",
+          "Its windows were dark and its door was already open."
+        ]
 
-It had not been there at eleven.
-
-The front door was open.
-
-Elias stepped inside.`
       },
 
       {
-        title: "Chapter Two — The Hallway",
+        title: "Inside",
 
-        text: `There were no clocks in the house.
+        content: [
+          "Every room looked familiar.",
+          "But none of them belonged to the world outside.",
+          "There was not a single clock anywhere."
+        ]
 
-Instead, every wall carried a small painted eye.
-
-When Elias walked past them, the eyes turned.`
       },
 
       {
-        title: "Chapter Three — Upstairs",
+        title: "The Door",
 
-        text: `The room upstairs contained a chair and a window.
+        content: [
+          "At the end of the hallway stood one final door.",
+          "Behind it was the answer.",
+          "And perhaps another question."
+        ]
 
-Through the window was a street Elias had never seen.
-
-Then he recognized it.
-
-It was his own street.`
       }
 
     ]
@@ -267,37 +625,84 @@ It was his own street.`
     chapters: [
 
       {
-        title: "Chapter One — The First Letter",
+        title: "The First Letter",
 
-        text: `The envelope had no stamp.
+        content: [
+          "The letter arrived on an ordinary Tuesday.",
+          "The strange part was the date written on it.",
+          "It was dated ten years in the future."
+        ]
 
-No address.
-
-Only his name.
-
-The handwriting looked familiar.
-
-It was his own handwriting.`
       },
 
       {
-        title: "Chapter Two — Thursday",
+        title: "Tomorrow",
 
-        text: `The letter described Thursday in impossible detail.
+        content: [
+          "Another letter arrived the following morning.",
+          "It predicted something that had not happened yet.",
+          "By evening, the prediction came true."
+        ]
 
-Every prediction came true.
-
-By evening, Noah was beginning to believe the letters.`
       },
 
       {
-        title: "Chapter Three — Don't Open The Fourth",
+        title: "The Last Message",
 
-        text: `The third letter ended with a warning.
+        content: [
+          "The final letter contained only one instruction.",
+          "Do not send another letter.",
+          "The future had finally caught up."
+        ]
 
-The fourth envelope would arrive Monday.
+      }
 
-Do not open it.`
+    ]
+
+  },
+
+
+  "order-within": {
+
+    title: "The Order Within",
+
+    author: "Nikender Singh",
+
+    genre: "Psychological Thriller",
+
+    chapters: [
+
+      {
+        title: "Chapter One",
+
+        content: [
+          "The house was silent.",
+          "Everything inside it seemed deliberately arranged.",
+          "Yet something about that perfect order felt deeply wrong."
+        ]
+
+      },
+
+      {
+        title: "Chapter Two",
+
+        content: [
+          "Months later, a new detective was assigned to a cold case.",
+          "His partner was an older investigator known for noticing details others ignored.",
+          "Neither of them knew how closely the case would eventually connect to them."
+        ]
+
+      },
+
+      {
+        title: "Chapter Three",
+
+        content: [
+          "The investigation slowly revealed contradictions.",
+          "Small details began appearing where they should not have been.",
+          "Someone had been controlling the story from the beginning."
+        ]
+
       }
 
     ]
@@ -307,112 +712,423 @@ Do not open it.`
 };
 
 
+/* GET BOOK */
+
 const params =
   new URLSearchParams(window.location.search);
 
+const bookId =
+  params.get("book") || "last-train";
+
+
 const book =
-  books[params.get("book")] || books["last-train"];
+  books[bookId] || books["last-train"];
+
+
+/* ELEMENTS */
+
+const titleElement =
+  document.getElementById("bookTitle");
+
+const authorElement =
+  document.getElementById("author");
+
+const genreElement =
+  document.getElementById("genre");
+
+const chapterSelect =
+  document.getElementById("chapterSelect");
+
+const chapterTitle =
+  document.getElementById("chapterTitle");
+
+const chapterContent =
+  document.getElementById("chapterContent");
+
+const progress =
+  document.getElementById("progress");
+
+const progressText =
+  document.getElementById("progressText");
+
+const previousButton =
+  document.getElementById("previousButton");
+
+const nextButton =
+  document.getElementById("nextButton");
+
+const completeBox =
+  document.getElementById("completeBox");
 
 
 let currentChapter = 0;
 
 
-document.getElementById("title").textContent =
+/* BOOK INFO */
+
+titleElement.textContent =
   book.title;
 
-document.getElementById("author").textContent =
+authorElement.textContent =
   "by " + book.author;
 
-document.getElementById("genre").textContent =
+genreElement.textContent =
   book.genre;
 
 
-const select =
-  document.getElementById("chapterSelect");
+/* CHAPTER SELECT */
+
+book.chapters.forEach(
+  (chapter, index) => {
+
+    const option =
+      document.createElement("option");
+
+    option.value = index;
+
+    option.textContent =
+      chapter.title;
+
+    chapterSelect.appendChild(option);
+
+  }
+);
 
 
-book.chapters.forEach((chapter, index) => {
+/* DISPLAY CHAPTER */
 
-  const option =
-    document.createElement("option");
+function displayChapter(index) {
 
-  option.value = index;
-
-  option.textContent =
-    chapter.title;
-
-  select.appendChild(option);
-
-});
-
-
-select.addEventListener("change", function() {
-
-  currentChapter =
-    Number(select.value);
-
-  showChapter();
-
-});
-
-
-function showChapter() {
+  currentChapter = index;
 
   const chapter =
-    book.chapters[currentChapter];
-
-  document.getElementById("chapterTitle")
-    .textContent = chapter.title;
-
-  document.getElementById("story")
-    .textContent = chapter.text;
-
-  document.getElementById("chapterNumber")
-    .textContent =
-      "Chapter " +
-      (currentChapter + 1) +
-      " / " +
-      book.chapters.length;
-
-  select.value =
-    currentChapter;
-}
+    book.chapters[index];
 
 
-function nextChapter() {
+  chapterTitle.textContent =
+    chapter.title;
+
+
+  chapterContent.innerHTML = "";
+
+
+  chapter.content.forEach(
+    paragraph => {
+
+      const p =
+        document.createElement("p");
+
+      p.textContent =
+        paragraph;
+
+      chapterContent.appendChild(p);
+
+    }
+  );
+
+
+  chapterSelect.value =
+    index;
+
+
+  const percent =
+    ((index + 1) / book.chapters.length) * 100;
+
+
+  progress.style.width =
+    percent + "%";
+
+
+  progressText.textContent =
+    "Chapter " +
+    (index + 1) +
+    " of " +
+    book.chapters.length;
+
+
+  previousButton.disabled =
+    index === 0;
+
+
+  nextButton.textContent =
+    index === book.chapters.length - 1
+      ? "Finish Book ✓"
+      : "Next →";
+
 
   if (
-    currentChapter <
-    book.chapters.length - 1
+    index === book.chapters.length - 1
   ) {
 
-    currentChapter++;
+    completeBox.classList.add("show");
 
-    showChapter();
+    loadComments();
 
-    window.scrollTo(0, 0);
+  } else {
+
+    completeBox.classList.remove("show");
+
   }
+
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 
 }
 
 
-function previousChapter() {
+/* SELECT CHAPTER */
 
-  if (currentChapter > 0) {
+chapterSelect.addEventListener(
+  "change",
+  function() {
 
-    currentChapter--;
+    displayChapter(
+      Number(this.value)
+    );
 
-    showChapter();
-
-    window.scrollTo(0, 0);
   }
+);
+
+
+/* PREVIOUS */
+
+previousButton.addEventListener(
+  "click",
+  function() {
+
+    if (currentChapter > 0) {
+
+      displayChapter(
+        currentChapter - 1
+      );
+
+    }
+
+  }
+);
+
+
+/* NEXT */
+
+nextButton.addEventListener(
+  "click",
+  function() {
+
+    if (
+      currentChapter <
+      book.chapters.length - 1
+    ) {
+
+      displayChapter(
+        currentChapter + 1
+      );
+
+    }
+
+  }
+);
+
+
+/* RATING */
+
+const stars =
+  document.querySelectorAll(".star");
+
+const ratingMessage =
+  document.getElementById("ratingMessage");
+
+
+stars.forEach(
+  star => {
+
+    star.addEventListener(
+      "click",
+      function() {
+
+        const rating =
+          Number(this.dataset.rating);
+
+
+        stars.forEach(
+          s => {
+
+            s.classList.toggle(
+              "active",
+              Number(s.dataset.rating) <= rating
+            );
+
+          }
+        );
+
+
+        localStorage.setItem(
+          "rating-" + bookId,
+          rating
+        );
+
+
+        ratingMessage.textContent =
+          "You rated this book " +
+          rating +
+          "/5.";
+
+      }
+    );
+
+  }
+);
+
+
+/* LOAD SAVED RATING */
+
+const savedRating =
+  Number(
+    localStorage.getItem(
+      "rating-" + bookId
+    )
+  );
+
+
+if (savedRating) {
+
+  stars.forEach(
+    star => {
+
+      star.classList.toggle(
+        "active",
+        Number(star.dataset.rating) <= savedRating
+      );
+
+    }
+  );
+
+  ratingMessage.textContent =
+    "You rated this book " +
+    savedRating +
+    "/5.";
 
 }
 
 
-showChapter();
+/* COMMENTS */
+
+const commentForm =
+  document.getElementById("commentForm");
+
+const commentsList =
+  document.getElementById("commentsList");
+
+
+function getComments() {
+
+  return JSON.parse(
+    localStorage.getItem(
+      "comments-" + bookId
+    )
+  ) || [];
+
+}
+
+
+function loadComments() {
+
+  const comments =
+    getComments();
+
+
+  commentsList.innerHTML = "";
+
+
+  comments.forEach(
+    comment => {
+
+      const div =
+        document.createElement("div");
+
+      div.className =
+        "comment";
+
+
+      const name =
+        document.createElement("strong");
+
+      name.textContent =
+        comment.name;
+
+
+      const text =
+        document.createElement("p");
+
+      text.textContent =
+        comment.text;
+
+
+      div.appendChild(name);
+
+      div.appendChild(text);
+
+      commentsList.appendChild(div);
+
+    }
+  );
+
+}
+
+
+commentForm.addEventListener(
+  "submit",
+  function(event) {
+
+    event.preventDefault();
+
+
+    const name =
+      document.getElementById("commentName")
+        .value
+        .trim();
+
+    const text =
+      document.getElementById("commentText")
+        .value
+        .trim();
+
+
+    const comments =
+      getComments();
+
+
+    comments.push({
+
+      name: name,
+
+      text: text
+
+    });
+
+
+    localStorage.setItem(
+      "comments-" + bookId,
+      JSON.stringify(comments)
+    );
+
+
+    commentForm.reset();
+
+    loadComments();
+
+  }
+);
+
+
+/* START */
+
+displayChapter(0);
 
 </script>
 
 </body>
+
 </html>
