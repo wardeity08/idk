@@ -1,354 +1,250 @@
-/* =========================================================
-   OPENSHELF — THEME SYSTEM
-   ========================================================= */
+document.addEventListener("DOMContentLoaded", () => {
 
-const THEMES = [
-  "light",
-  "cozy",
-  "cafe",
-  "editorial"
-];
+  // =========================
+  // THEME SYSTEM
+  // =========================
 
-const THEME_KEY = "openshelf-theme";
+  const themeSelect = document.getElementById("themeSelect");
 
-const body =
-  document.body;
+  function setTheme(theme) {
+    document.body.setAttribute("data-theme", theme);
+    localStorage.setItem("openshelf-theme", theme);
 
-const themeButton =
-  document.getElementById("themeButton");
-
-const themeMenu =
-  document.getElementById("themeMenu");
-
-const options =
-  document.querySelectorAll(".theme-option");
-
-const dot =
-  document.querySelector(".theme-dot");
-
-
-/* =========================================================
-   SET THEME
-   ========================================================= */
-
-function setTheme(theme, save = true) {
-
-  if (!THEMES.includes(theme)) {
-    theme = "light";
-  }
-
-  body.dataset.theme = theme;
-
-  if (save) {
-
-    try {
-
-      localStorage.setItem(
-        THEME_KEY,
-        theme
-      );
-
-    } catch (error) {}
-
-  }
-
-  options.forEach(option => {
-
-    option.classList.toggle(
-      "selected",
-      option.dataset.themeChoice === theme
-    );
-
-  });
-
-  const swatch =
-    document.querySelector(
-      `[data-theme-choice="${theme}"] .theme-swatch`
-    );
-
-  if (swatch) {
-
-    dot.style.background =
-      getComputedStyle(swatch).background;
-
-  }
-
-}
-
-
-/* =========================================================
-   LOAD SAVED THEME
-   ========================================================= */
-
-function loadTheme() {
-
-  let saved =
-    "light";
-
-  try {
-
-    saved =
-      localStorage.getItem(
-        THEME_KEY
-      ) || "light";
-
-  } catch (error) {}
-
-  setTheme(
-    saved,
-    false
-  );
-
-}
-
-
-/* =========================================================
-   OPEN/CLOSE THEME MENU
-   ========================================================= */
-
-themeButton.addEventListener(
-  "click",
-  () => {
-
-    const open =
-      !themeMenu.hasAttribute(
-        "hidden"
-      );
-
-    if (open) {
-
-      themeMenu.setAttribute(
-        "hidden",
-        ""
-      );
-
-    } else {
-
-      themeMenu.removeAttribute(
-        "hidden"
-      );
-
+    if (themeSelect) {
+      themeSelect.value = theme;
     }
-
-    themeButton.setAttribute(
-      "aria-expanded",
-      String(!open)
-    );
-
   }
-);
 
+  const savedTheme = localStorage.getItem("openshelf-theme") || "light";
+  setTheme(savedTheme);
 
-/* =========================================================
-   SELECT THEME
-   ========================================================= */
-
-options.forEach(option => {
-
-  option.addEventListener(
-    "click",
-    () => {
-
-      setTheme(
-        option.dataset.themeChoice
-      );
-
-      themeMenu.setAttribute(
-        "hidden",
-        ""
-      );
-
-      themeButton.setAttribute(
-        "aria-expanded",
-        "false"
-      );
-
-    }
-  );
-
-});
-
-
-/* =========================================================
-   CLOSE MENU WHEN CLICKING OUTSIDE
-   ========================================================= */
-
-document.addEventListener(
-  "click",
-  event => {
-
-    if (
-      !event.target.closest(
-        ".theme-picker"
-      )
-    ) {
-
-      themeMenu.setAttribute(
-        "hidden",
-        ""
-      );
-
-      themeButton.setAttribute(
-        "aria-expanded",
-        "false"
-      );
-
-    }
-
+  if (themeSelect) {
+    themeSelect.addEventListener("change", () => {
+      setTheme(themeSelect.value);
+    });
   }
-);
 
 
-/* =========================================================
-   SEARCH
-   ========================================================= */
+  // =========================
+  // BOOK DATA
+  // =========================
 
-const search =
-  document.getElementById(
-    "searchInput"
-  );
-
-const genre =
-  document.getElementById(
-    "genreFilter"
-  );
-
-const cards =
-  [
-    ...document.querySelectorAll(
-      ".book-card"
-    )
+  const books = [
+    {
+      title: "The Last Train",
+      author: "Mara Ellis",
+      genre: "Mystery"
+    },
+    {
+      title: "The House With No Clock",
+      author: "Eli Mercer",
+      genre: "Fantasy"
+    },
+    {
+      title: "Letters From Tomorrow",
+      author: "Noah Vale",
+      genre: "Sci-Fi"
+    },
+    {
+      title: "The Order Within",
+      author: "Nikender Singh",
+      genre: "Psychological Thriller"
+    }
   ];
 
-const empty =
-  document.getElementById(
-    "emptyState"
-  );
 
-const count =
-  document.getElementById(
-    "resultCount"
-  );
+  // =========================
+  // SEARCH
+  // =========================
 
+  const searchInput = document.getElementById("searchInput");
+  const genreSelect = document.getElementById("genreSelect");
+  const bookCards = document.querySelectorAll(".book-card");
+  const resultCount = document.getElementById("resultCount");
 
-function filterBooks() {
+  function filterBooks() {
 
-  const query =
-    search.value
-      .trim()
-      .toLowerCase();
+    const search =
+      searchInput ? searchInput.value.toLowerCase().trim() : "";
 
-  const selectedGenre =
-    genre.value;
+    const genre =
+      genreSelect ? genreSelect.value.toLowerCase() : "all";
 
-  let visible = 0;
+    let visible = 0;
 
+    bookCards.forEach(card => {
 
-  cards.forEach(card => {
-
-    const title =
-      card.dataset.title
+      const title =
+        (card.dataset.title || card.querySelector("h3")?.textContent || "")
         .toLowerCase();
 
-    const author =
-      card.dataset.author
+      const author =
+        (card.dataset.author || card.querySelector(".book-author")?.textContent || "")
         .toLowerCase();
 
-    const cardGenre =
-      card.dataset.genre;
+      const cardGenre =
+        (card.dataset.genre || card.querySelector(".book-genre")?.textContent || "")
+        .toLowerCase();
 
+      const matchesSearch =
+        !search ||
+        title.includes(search) ||
+        author.includes(search) ||
+        cardGenre.includes(search);
 
-    const matchesText =
+      const matchesGenre =
+        genre === "all" ||
+        cardGenre === genre;
 
-      !query ||
+      if (matchesSearch && matchesGenre) {
+        card.style.display = "";
+        visible++;
+      } else {
+        card.style.display = "none";
+      }
+    });
 
-      title.includes(query) ||
-
-      author.includes(query) ||
-
-      cardGenre
-        .toLowerCase()
-        .includes(query);
-
-
-    const matchesGenre =
-
-      selectedGenre === "all" ||
-
-      cardGenre ===
-        selectedGenre;
-
-
-    const show =
-      matchesText &&
-      matchesGenre;
-
-
-    card.hidden =
-      !show;
-
-
-    if (show) {
-      visible++;
+    if (resultCount) {
+      resultCount.textContent =
+        `${visible} book${visible === 1 ? "" : "s"} found`;
     }
+  }
+
+  if (searchInput) {
+    searchInput.addEventListener("input", filterBooks);
+  }
+
+  if (genreSelect) {
+    genreSelect.addEventListener("change", filterBooks);
+  }
+
+
+  // =========================
+  // OPEN BOOK
+  // =========================
+
+  function openBook(title) {
+
+    if (title === "The Order Within") {
+      window.location.href = "reader.html";
+      return;
+    }
+
+    alert(`${title} is coming soon.`);
+  }
+
+  window.openBook = openBook;
+
+
+  // =========================
+  // EXPLORE LIBRARY
+  // =========================
+
+  const exploreButton = document.getElementById("exploreButton");
+
+  if (exploreButton) {
+    exploreButton.addEventListener("click", () => {
+
+      const library =
+        document.getElementById("library");
+
+      if (library) {
+        library.scrollIntoView({
+          behavior: "smooth"
+        });
+      }
+
+    });
+  }
+
+
+  // =========================
+  // SUBMIT BUTTON
+  // =========================
+
+  const submitButtons =
+    document.querySelectorAll("[data-submit]");
+
+  submitButtons.forEach(button => {
+
+    button.addEventListener("click", () => {
+
+      const submitSection =
+        document.getElementById("submit");
+
+      if (submitSection) {
+        submitSection.scrollIntoView({
+          behavior: "smooth"
+        });
+      }
+
+    });
 
   });
 
 
-  empty.hidden =
-    visible !== 0;
+  // =========================
+  // ADD A BOOK
+  // =========================
 
+  const addBookButton =
+    document.getElementById("addBookButton");
 
-  count.textContent =
-    `${visible} ${
-      visible === 1
-        ? "book"
-        : "books"
-    }`;
+  if (addBookButton) {
 
-}
+    addBookButton.addEventListener("click", () => {
 
+      const submitSection =
+        document.getElementById("submit");
 
-search.addEventListener(
-  "input",
-  filterBooks
-);
+      if (submitSection) {
 
-genre.addEventListener(
-  "change",
-  filterBooks
-);
+        submitSection.scrollIntoView({
+          behavior: "smooth"
+        });
 
+      }
 
-/* =========================================================
-   OPEN BOOK
-   ========================================================= */
+    });
 
-function openBook(title) {
-
-  if (
-    title ===
-    "The Order Within"
-  ) {
-
-    window.location.href =
-      "reader.html";
-
-    return;
   }
 
 
-  alert(
-    `${title}'s reader is coming soon.`
-  );
+  // =========================
+  // NAVIGATION
+  // =========================
 
-}
+  document.querySelectorAll('a[href^="#"]').forEach(link => {
+
+    link.addEventListener("click", event => {
+
+      const targetId =
+        link.getAttribute("href");
+
+      if (!targetId || targetId === "#") return;
+
+      const target =
+        document.querySelector(targetId);
+
+      if (target) {
+
+        event.preventDefault();
+
+        target.scrollIntoView({
+          behavior: "smooth"
+        });
+
+      }
+
+    });
+
+  });
 
 
-/* =========================================================
-   START
-   ========================================================= */
+  // =========================
+  // INITIAL FILTER
+  // =========================
 
-loadTheme();
+  filterBooks();
 
-filterBooks();
+});
