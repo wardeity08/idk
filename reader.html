@@ -2,1497 +2,1755 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Reading — OpenShelf</title>
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  <link rel="stylesheet" href="style.css">
+  <title>
+    OpenShelf Reader
+  </title>
 
-  <style>
+  <link
+    rel="stylesheet"
+    href="style.css"
+  >
 
-    /* =========================================================
-       READER BASE
-    ========================================================= */
+  <!-- Supabase -->
 
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      background: var(--bg);
-      color: var(--text);
-    }
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-    body {
-      min-height: 100vh;
-    }
+  <!-- DOCX -->
 
-    .reader-page {
-      min-height: 100vh;
-      background: var(--bg);
-      color: var(--text);
-    }
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js"></script>
 
+  <!-- EPUB -->
 
-    /* =========================================================
-       DARK READING THEME
-    ========================================================= */
-
-    body.reader-dark {
-      --bg: #171717;
-      --surface: #242424;
-      --surface-2: #2d2d2d;
-      --text: #e8e5df;
-      --muted: #aaa59d;
-      --accent: #c79b62;
-      --accent-2: #d28b62;
-      --border: rgba(255,255,255,0.10);
-      --shadow: 0 15px 40px rgba(0,0,0,0.35);
-    }
-
-
-    /* =========================================================
-       HEADER
-    ========================================================= */
-
-    .reader-header {
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-
-      padding: 12px 24px;
-
-      background: color-mix(
-        in srgb,
-        var(--bg) 94%,
-        transparent
-      );
-
-      backdrop-filter: blur(16px);
-
-      border-bottom: 1px solid var(--border);
-    }
-
-    .reader-left {
-      display: flex;
-      align-items: center;
-      gap: 15px;
-    }
-
-    .reader-title {
-      font-family: "Playfair Display", Georgia, serif;
-      font-weight: 600;
-      font-size: 20px;
-    }
-
-    .back-button,
-    .reader-theme,
-    .reader-control-button {
-      background: var(--surface);
-      color: var(--text);
-
-      border: 1px solid var(--border);
-      border-radius: 10px;
-
-      padding: 8px 12px;
-
-      cursor: pointer;
-
-      transition: 0.2s ease;
-    }
-
-    .back-button:hover,
-    .reader-theme:hover,
-    .reader-control-button:hover {
-      border-color: var(--accent);
-      transform: translateY(-1px);
-    }
-
-
-    /* =========================================================
-       READER TOOLBAR
-    ========================================================= */
-
-    .reader-tools {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .font-controls {
-      display: flex;
-      align-items: center;
-      gap: 4px;
-
-      background: var(--surface);
-
-      border: 1px solid var(--border);
-      border-radius: 10px;
-
-      padding: 3px;
-    }
-
-    .font-size-label {
-      min-width: 35px;
-      text-align: center;
-
-      font-size: 13px;
-      color: var(--muted);
-    }
-
-
-    /* =========================================================
-       MUSIC
-    ========================================================= */
-
-    .music-box {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-
-      background: var(--surface);
-
-      border: 1px solid var(--border);
-      border-radius: 10px;
-
-      padding: 4px;
-    }
-
-    .music-select {
-      max-width: 145px;
-
-      padding: 6px 7px;
-
-      border: 0;
-      outline: 0;
-
-      background: transparent;
-      color: var(--text);
-
-      cursor: pointer;
-    }
-
-    .music-volume {
-      width: 65px;
-      accent-color: var(--accent);
-    }
-
-
-    /* =========================================================
-       READER CONTAINER
-    ========================================================= */
-
-    .reader-container {
-      width: min(900px, calc(100% - 30px));
-
-      margin: 0 auto;
-
-      padding: 55px 0 100px;
-    }
-
-    .reader-book-title {
-      margin: 0;
-
-      font-family: "Playfair Display", Georgia, serif;
-
-      font-size: clamp(38px, 6vw, 65px);
-
-      line-height: 1.05;
-    }
-
-    .reader-author {
-      margin-top: 12px;
-      margin-bottom: 40px;
-
-      color: var(--muted);
-
-      font-size: 17px;
-    }
-
-
-    /* =========================================================
-       BOOK CONTENT
-    ========================================================= */
-
-    #readerContent {
-      width: 100%;
-
-      padding: 55px 65px;
-
-      background: var(--surface);
-      color: var(--text);
-
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-
-      box-shadow: var(--shadow);
-
-      font-family: Georgia, "Times New Roman", serif;
-
-      font-size: var(--reader-font-size, 19px);
-
-      line-height: 1.9;
-
-      min-height: 70vh;
-
-      transition:
-        background 0.3s ease,
-        color 0.3s ease,
-        font-size 0.2s ease;
-    }
-
-    #readerContent * {
-      background: transparent !important;
-      color: var(--text) !important;
-    }
-
-    #readerContent p {
-      margin: 0 0 24px;
-    }
-
-    #readerContent h1,
-    #readerContent h2,
-    #readerContent h3,
-    #readerContent h4,
-    #readerContent h5,
-    #readerContent h6 {
-
-      margin-top: 45px;
-      margin-bottom: 18px;
-
-      font-family: Georgia, "Times New Roman", serif;
-
-      line-height: 1.3;
-    }
-
-    #readerContent img {
-      max-width: 100%;
-      height: auto;
-    }
-
-
-    /* =========================================================
-       HIGHLIGHT
-    ========================================================= */
-
-    #readerContent .openshelf-highlight {
-      background: #ffe28a !important;
-      color: #171717 !important;
-
-      border-radius: 3px;
-
-      padding: 1px 2px;
-    }
-
-    .highlight-active {
-      border-color: #e1b94d !important;
-    }
-
-
-    /* =========================================================
-       PROGRESS
-    ========================================================= */
-
-    .progress-wrapper {
-      position: fixed;
-
-      top: 0;
-      left: 0;
-
-      width: 100%;
-      height: 4px;
-
-      z-index: 2000;
-    }
-
-    #progressBar {
-      width: 0;
-      height: 100%;
-
-      background: var(--accent);
-
-      transition: width 0.1s linear;
-    }
-
-
-    /* =========================================================
-       LOADING / ERROR
-    ========================================================= */
-
-    .loading-message {
-      opacity: 0.7;
-
-      text-align: center;
-
-      padding: 50px 0;
-    }
-
-    .error-message {
-      text-align: center;
-
-      padding: 50px 0;
-    }
-
-
-    /* =========================================================
-       MOBILE
-    ========================================================= */
-
-    @media (max-width: 900px) {
-
-      .reader-header {
-        align-items: flex-start;
-        gap: 10px;
-      }
-
-      .reader-tools {
-        max-width: 70%;
-      }
-
-      .music-volume {
-        display: none;
-      }
-    }
-
-
-    @media (max-width: 700px) {
-
-      .reader-header {
-        padding: 10px 12px;
-      }
-
-      .reader-title {
-        display: none;
-      }
-
-      .reader-tools {
-        max-width: 100%;
-      }
-
-      .reader-theme {
-        max-width: 120px;
-      }
-
-      .music-select {
-        max-width: 100px;
-      }
-
-      .reader-container {
-        width: 94%;
-
-        padding-top: 35px;
-      }
-
-      #readerContent {
-        padding: 32px 22px;
-
-        font-size: var(--reader-font-size, 17px);
-
-        line-height: 1.8;
-
-        border-radius: 12px;
-      }
-    }
-
-  </style>
+  <script src="https://cdn.jsdelivr.net/npm/epubjs@0.3.93/dist/epub.min.js"></script>
 
 </head>
 
 
 <body class="reader-page">
 
-  <!-- =======================================================
-       READING PROGRESS
-  ======================================================== -->
 
-  <div class="progress-wrapper">
-    <div id="progressBar"></div>
-  </div>
+<header class="site-header reader-header">
+
+  <a
+    class="brand"
+    href="index.html"
+  >
+    OpenShelf
+  </a>
 
 
-  <!-- =======================================================
-       HEADER
-  ======================================================== -->
+  <div class="reader-actions">
 
-  <header class="reader-header">
+    <button
+      id="fontDecrease"
+      type="button"
+    >
+      A−
+    </button>
 
-    <div class="reader-left">
+
+    <button
+      id="fontReset"
+      type="button"
+    >
+      A
+    </button>
+
+
+    <button
+      id="fontIncrease"
+      type="button"
+    >
+      A+
+    </button>
+
+
+    <button
+      id="highlightButton"
+      type="button"
+    >
+      Highlight
+    </button>
+
+
+    <button
+      id="readerThemeButton"
+      type="button"
+    >
+      Theme
+    </button>
+
+
+    <div
+      class="theme-menu reader-theme-menu"
+      id="readerThemeMenu"
+    >
 
       <button
-        class="back-button"
-        onclick="window.location.href='index.html'">
-        ← Library
+        class="reader-theme-option"
+        data-theme="light"
+        type="button"
+      >
+        Light
       </button>
 
-      <div class="reader-title">
-        OpenShelf
-      </div>
+
+      <button
+        class="reader-theme-option"
+        data-theme="cozy"
+        type="button"
+      >
+        Cozy Library
+      </button>
+
+
+      <button
+        class="reader-theme-option"
+        data-theme="cafe"
+        type="button"
+      >
+        Café & Books
+      </button>
+
+
+      <button
+        class="reader-theme-option"
+        data-theme="editorial"
+        type="button"
+      >
+        Editorial
+      </button>
+
+
+      <button
+        class="reader-theme-option"
+        data-theme="dark"
+        type="button"
+      >
+        Dark Reading
+      </button>
+
+    </div>
+
+
+    <a
+      class="back-button"
+      href="index.html"
+    >
+      Library
+    </a>
+
+  </div>
+
+</header>
+
+
+
+<main class="reader-main">
+
+
+  <!-- BOOK INFORMATION -->
+
+  <section class="reader-top">
+
+    <div>
+
+      <p class="eyebrow">
+        Now reading
+      </p>
+
+
+      <h1 id="bookTitle">
+        Loading...
+      </h1>
+
+
+      <p id="bookMeta"></p>
 
     </div>
 
 
     <div class="reader-tools">
 
-      <!-- FONT SIZE -->
-
-      <div class="font-controls">
-
-        <button
-          id="fontDown"
-          class="reader-control-button"
-          title="Decrease font size">
-          A−
-        </button>
-
-        <span
-          id="fontSizeLabel"
-          class="font-size-label">
-          19
-        </span>
-
-        <button
-          id="fontUp"
-          class="reader-control-button"
-          title="Increase font size">
-          A+
-        </button>
-
-        <button
-          id="fontReset"
-          class="reader-control-button"
-          title="Reset font size">
-          ↺
-        </button>
-
-      </div>
-
-
-      <!-- HIGHLIGHT -->
-
-      <button
-        id="highlightButton"
-        class="reader-control-button"
-        title="Highlight selected text">
-        🖍️
-      </button>
-
-
-      <!-- MUSIC -->
-
-      <div class="music-box">
-
-        <select
-          id="musicSelect"
-          class="music-select"
-          title="Choose reading music">
-
-          <option value="none">
-            🎵 Music Off
-          </option>
-
-          <option value="rain">
-            🌧️ Rain
-          </option>
-
-          <option value="piano">
-            🎹 Soft Piano
-          </option>
-
-          <option value="night">
-            🌙 Night
-          </option>
-
-          <option value="cafe">
-            ☕ Café
-          </option>
-
-        </select>
-
-        <button
-          id="musicPlay"
-          class="reader-control-button"
-          title="Play / Pause">
-          ▶
-        </button>
-
-        <input
-          id="musicVolume"
-          class="music-volume"
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value="0.25"
-          title="Volume">
-
-      </div>
-
-
-      <!-- THEME -->
-
       <select
-        id="readerTheme"
-        class="reader-theme">
+        id="musicSelect"
+        aria-label="Background music"
+      >
 
-        <option value="light">
-          ☀️ Light
+        <option value="none">
+          No music
         </option>
 
-        <option value="cozy">
-          📚 Cozy Library
+        <option value="rain">
+          Rain
+        </option>
+
+        <option value="piano">
+          Soft Piano
+        </option>
+
+        <option value="night">
+          Night
         </option>
 
         <option value="cafe">
-          ☕ Café & Books
-        </option>
-
-        <option value="editorial">
-          📰 Editorial
-        </option>
-
-        <option value="dark">
-          🌙 Dark
+          Café
         </option>
 
       </select>
 
+
+      <button
+        id="musicToggle"
+        type="button"
+      >
+        Play music
+      </button>
+
+
+      <a
+        id="openOriginal"
+        href="#"
+        target="_blank"
+        rel="noopener"
+      >
+        Open original
+      </a>
+
     </div>
 
-  </header>
+  </section>
 
 
-  <!-- =======================================================
-       BOOK
-  ======================================================== -->
 
-  <main class="reader-container">
+  <!-- READING PROGRESS -->
 
-    <h1
-      id="readerBookTitle"
-      class="reader-book-title">
-      Loading...
-    </h1>
+  <div class="reading-progress">
 
     <div
-      id="readerAuthor"
-      class="reader-author">
-      Loading book information...
+      id="readingProgressBar"
+    ></div>
+
+  </div>
+
+
+
+  <!-- READER -->
+
+  <section
+    id="readerShell"
+    class="reader-shell"
+  >
+
+    <div
+      id="readerContent"
+      class="reader-content"
+    >
+
+      <p class="loading-message">
+        Loading book...
+      </p>
+
     </div>
 
-
-    <article id="readerContent">
-
-      <div class="loading-message">
-        Loading book...
-      </div>
-
-    </article>
-
-  </main>
+  </section>
 
 
-  <!-- =======================================================
-       SUPABASE
-  ======================================================== -->
-
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-
-  <!-- =======================================================
-       MAMMOTH
-  ======================================================== -->
-
-  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js"></script>
+  <p
+    id="readerMessage"
+    class="reader-message"
+  ></p>
 
 
-  <script>
+</main>
 
-    /* =======================================================
-       SUPABASE
-    ======================================================== */
 
-    const SUPABASE_URL =
-      "https://kdycmaicayaesnpkqfgp.supabase.co";
 
-    const SUPABASE_KEY =
-      "sb_publishable_LC_ZkgE8N9p_t6d7KIhC_w_437ZMCFH";
+<script>
 
-    const supabaseClient =
-      window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
+/* =========================================================
+   SUPABASE
+   ========================================================= */
+
+const SUPABASE_URL =
+  "https://kdycmaicayaesnpkqfgp.supabase.co";
+
+
+const SUPABASE_KEY =
+  "sb_publishable_LC_ZkgE8N9p_t6d7KIhC_w_437ZMCFH";
+
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+  );
+
+
+
+/* =========================================================
+   BOOK ID
+   ========================================================= */
+
+const params =
+  new URLSearchParams(
+    window.location.search
+  );
+
+
+const bookId =
+  params.get("id");
+
+
+
+/* =========================================================
+   ELEMENTS
+   ========================================================= */
+
+const readerContent =
+  document.getElementById(
+    "readerContent"
+  );
+
+
+const bookTitle =
+  document.getElementById(
+    "bookTitle"
+  );
+
+
+const bookMeta =
+  document.getElementById(
+    "bookMeta"
+  );
+
+
+const readerMessage =
+  document.getElementById(
+    "readerMessage"
+  );
+
+
+const openOriginal =
+  document.getElementById(
+    "openOriginal"
+  );
+
+
+const progressBar =
+  document.getElementById(
+    "readingProgressBar"
+  );
+
+
+
+let currentFontSize =
+  Number(
+    localStorage.getItem(
+      "openshelf-font-size"
+    )
+  ) || 18;
+
+
+let epubBook = null;
+
+let epubRendition = null;
+
+
+
+/* =========================================================
+   FILE EXTENSION
+   ========================================================= */
+
+function getExtension(url) {
+
+  const clean =
+    url
+      .split("?")[0]
+      .split("#")[0];
+
+
+  const filename =
+    clean.substring(
+      clean.lastIndexOf("/") + 1
+    );
+
+
+  const dot =
+    filename.lastIndexOf(".");
+
+
+  if (dot === -1) {
+    return "";
+  }
+
+
+  return filename
+    .slice(dot + 1)
+    .toLowerCase();
+
+}
+
+
+
+/* =========================================================
+   ESCAPE HTML
+   ========================================================= */
+
+function escapeHtml(value = "") {
+
+  return String(value).replace(
+    /[&<>"']/g,
+    character => {
+
+      const map = {
+
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+
+      };
+
+      return map[character];
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+function setMessage(
+  message,
+  type = ""
+) {
+
+  readerMessage.textContent =
+    message;
+
+  readerMessage.className =
+    `reader-message ${type}`.trim();
+
+}
+
+
+
+/* =========================================================
+   READER THEMES
+   ========================================================= */
+
+function applyTheme(theme) {
+
+  const allowed = [
+
+    "light",
+    "cozy",
+    "cafe",
+    "editorial",
+    "dark"
+
+  ];
+
+
+  if (!allowed.includes(theme)) {
+
+    theme = "light";
+
+  }
+
+
+  document.body.dataset.theme =
+    theme;
+
+
+  localStorage.setItem(
+    "openshelf-reader-theme",
+    theme
+  );
+
+
+  document
+    .querySelectorAll(
+      ".reader-theme-option"
+    )
+    .forEach(button => {
+
+      button.classList.toggle(
+        "active",
+        button.dataset.theme === theme
       );
 
-
-    /* =======================================================
-       ELEMENTS
-    ======================================================== */
-
-    const titleElement =
-      document.getElementById("readerBookTitle");
-
-    const authorElement =
-      document.getElementById("readerAuthor");
-
-    const contentElement =
-      document.getElementById("readerContent");
-
-    const themeSelector =
-      document.getElementById("readerTheme");
-
-    const progressBar =
-      document.getElementById("progressBar");
-
-    const fontDown =
-      document.getElementById("fontDown");
-
-    const fontUp =
-      document.getElementById("fontUp");
-
-    const fontReset =
-      document.getElementById("fontReset");
-
-    const fontSizeLabel =
-      document.getElementById("fontSizeLabel");
-
-    const highlightButton =
-      document.getElementById("highlightButton");
-
-    const musicSelect =
-      document.getElementById("musicSelect");
-
-    const musicPlay =
-      document.getElementById("musicPlay");
-
-    const musicVolume =
-      document.getElementById("musicVolume");
+    });
 
 
-    /* =======================================================
-       READER THEME
-    ======================================================== */
+  /* EPUB theme */
 
-    const savedReaderTheme =
-      localStorage.getItem("openshelf-reader-theme") || "light";
+  if (epubRendition) {
 
-    applyReaderTheme(savedReaderTheme);
-
-    themeSelector.value =
-      savedReaderTheme;
+    const dark =
+      theme === "dark";
 
 
-    themeSelector.addEventListener(
-      "change",
-      function () {
+    epubRendition.themes.register(
+      "openshelf-theme",
+      {
 
-        applyReaderTheme(this.value);
+        body: {
 
-        localStorage.setItem(
-          "openshelf-reader-theme",
-          this.value
-        );
+          color:
+            dark
+              ? "#eeeae2 !important"
+              : "#222 !important",
+
+          background:
+            dark
+              ? "#272727 !important"
+              : "#ffffff !important"
+
+        }
 
       }
     );
 
 
-    function applyReaderTheme(theme) {
+    epubRendition.themes.select(
+      "openshelf-theme"
+    );
 
-      document.body.classList.toggle(
-        "reader-dark",
-        theme === "dark"
-      );
+  }
 
-      document.body.setAttribute(
-        "data-theme",
-        theme === "dark"
-          ? "light"
-          : theme
+}
+
+
+
+function initThemes() {
+
+  applyTheme(
+
+    localStorage.getItem(
+      "openshelf-reader-theme"
+    ) || "light"
+
+  );
+
+
+  const button =
+    document.getElementById(
+      "readerThemeButton"
+    );
+
+
+  const menu =
+    document.getElementById(
+      "readerThemeMenu"
+    );
+
+
+  button.addEventListener(
+    "click",
+    event => {
+
+      event.stopPropagation();
+
+      menu.classList.toggle(
+        "open"
       );
 
     }
+  );
 
 
-    /* =======================================================
-       FONT SIZE
-    ======================================================== */
+  document
+    .querySelectorAll(
+      ".reader-theme-option"
+    )
+    .forEach(option => {
 
-    let readerFontSize =
-      Number(
-        localStorage.getItem(
-          "openshelf-font-size"
-        )
-      ) || 19;
+      option.addEventListener(
+        "click",
+        () => {
+
+          applyTheme(
+            option.dataset.theme
+          );
+
+          menu.classList.remove(
+            "open"
+          );
+
+        }
+      );
+
+    });
 
 
-    function updateFontSize() {
+  document.addEventListener(
+    "click",
+    event => {
 
-      readerFontSize =
+      if (
+        !menu.contains(
+          event.target
+        ) &&
+        event.target !== button
+      ) {
+
+        menu.classList.remove(
+          "open"
+        );
+
+      }
+
+    }
+  );
+
+}
+
+
+
+/* =========================================================
+   FONT SIZE
+   ========================================================= */
+
+function applyFontSize() {
+
+  localStorage.setItem(
+    "openshelf-font-size",
+    currentFontSize
+  );
+
+
+  readerContent.style
+    .setProperty(
+      "--reader-font-size",
+      `${currentFontSize}px`
+    );
+
+
+  readerContent
+    .querySelectorAll(
+      ".reader-text, .reader-text *"
+    )
+    .forEach(element => {
+
+      element.style.fontSize =
+        `${currentFontSize}px`;
+
+    });
+
+
+  if (epubRendition) {
+
+    epubRendition
+      .themes
+      .fontSize(
+        `${currentFontSize}px`
+      );
+
+  }
+
+}
+
+
+
+document
+  .getElementById(
+    "fontDecrease"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      currentFontSize =
         Math.max(
-          14,
-          Math.min(
-            30,
-            readerFontSize
-          )
+          12,
+          currentFontSize - 1
         );
 
-      contentElement.style.setProperty(
-        "--reader-font-size",
-        readerFontSize + "px"
-      );
-
-      fontSizeLabel.textContent =
-        readerFontSize;
-
-      localStorage.setItem(
-        "openshelf-font-size",
-        readerFontSize
-      );
+      applyFontSize();
 
     }
+  );
 
 
-    fontDown.addEventListener(
-      "click",
-      function () {
 
-        readerFontSize -= 1;
+document
+  .getElementById(
+    "fontReset"
+  )
+  .addEventListener(
+    "click",
+    () => {
 
-        updateFontSize();
+      currentFontSize = 18;
 
-      }
-    );
+      applyFontSize();
 
-
-    fontUp.addEventListener(
-      "click",
-      function () {
-
-        readerFontSize += 1;
-
-        updateFontSize();
-
-      }
-    );
+    }
+  );
 
 
-    fontReset.addEventListener(
-      "click",
-      function () {
 
-        readerFontSize = 19;
+document
+  .getElementById(
+    "fontIncrease"
+  )
+  .addEventListener(
+    "click",
+    () => {
 
-        updateFontSize();
-
-      }
-    );
-
-
-    updateFontSize();
-
-
-    /* =======================================================
-       HIGHLIGHT SELECTED TEXT
-    ======================================================== */
-
-    highlightButton.addEventListener(
-      "click",
-      function () {
-
-        const selection =
-          window.getSelection();
-
-        if (
-          !selection ||
-          selection.isCollapsed
-        ) {
-
-          alert(
-            "Select some text first."
-          );
-
-          return;
-        }
-
-
-        const range =
-          selection.getRangeAt(0);
-
-
-        if (
-          !contentElement.contains(
-            range.commonAncestorContainer
-          )
-        ) {
-
-          return;
-        }
-
-
-        try {
-
-          const span =
-            document.createElement("span");
-
-          span.className =
-            "openshelf-highlight";
-
-          range.surroundContents(span);
-
-          selection.removeAllRanges();
-
-        }
-
-        catch (error) {
-
-          /*
-             If the selection crosses multiple
-             HTML elements, use the browser's
-             built-in highlighting command.
-          */
-
-          document.execCommand(
-            "backColor",
-            false,
-            "#ffe28a"
-          );
-
-          selection.removeAllRanges();
-
-        }
-
-      }
-    );
-
-
-    /* =======================================================
-       MUSIC ENGINE
-       -------------------------------------------------------
-       These are built-in ambient soundscapes.
-       Nothing is uploaded and nothing is stored.
-    ======================================================== */
-
-    let audioContext = null;
-
-    let masterGain = null;
-
-    let musicNodes = [];
-
-    let musicRunning = false;
-
-
-    function createAudioContext() {
-
-      if (!audioContext) {
-
-        audioContext =
-          new (
-            window.AudioContext ||
-            window.webkitAudioContext
-          )();
-
-        masterGain =
-          audioContext.createGain();
-
-        masterGain.gain.value =
-          Number(
-            musicVolume.value
-          );
-
-        masterGain.connect(
-          audioContext.destination
+      currentFontSize =
+        Math.min(
+          34,
+          currentFontSize + 1
         );
 
-      }
+      applyFontSize();
 
     }
+  );
 
 
-    function stopMusic() {
 
-      musicNodes.forEach(
-        function (node) {
+/* =========================================================
+   HIGHLIGHT
+   ========================================================= */
 
-          try {
+document
+  .getElementById(
+    "highlightButton"
+  )
+  .addEventListener(
+    "click",
+    () => {
 
-            node.stop();
-
-          }
-
-          catch (e) {}
-
-        }
-      );
-
-      musicNodes = [];
-
-      musicRunning = false;
-
-      musicPlay.textContent = "▶";
-
-    }
-
-
-    function makeOscillator(
-      frequency,
-      type,
-      volume,
-      duration
-    ) {
-
-      const oscillator =
-        audioContext.createOscillator();
-
-      const gain =
-        audioContext.createGain();
-
-
-      oscillator.type =
-        type;
-
-      oscillator.frequency.value =
-        frequency;
-
-      gain.gain.value =
-        volume;
-
-
-      oscillator.connect(gain);
-
-      gain.connect(masterGain);
-
-
-      oscillator.start();
-
-      oscillator.stop(
-        audioContext.currentTime +
-        duration
-      );
-
-
-      musicNodes.push(
-        oscillator
-      );
-
-    }
-
-
-    function createRain() {
-
-      /*
-         Soft filtered noise.
-      */
-
-      const bufferSize =
-        audioContext.sampleRate * 2;
-
-      const buffer =
-        audioContext.createBuffer(
-          1,
-          bufferSize,
-          audioContext.sampleRate
-        );
-
-      const data =
-        buffer.getChannelData(0);
-
-
-      for (
-        let i = 0;
-        i < bufferSize;
-        i++
-      ) {
-
-        data[i] =
-          (Math.random() * 2 - 1) * 0.25;
-
-      }
-
-
-      const source =
-        audioContext.createBufferSource();
-
-      source.buffer =
-        buffer;
-
-      source.loop = true;
-
-
-      const filter =
-        audioContext.createBiquadFilter();
-
-      filter.type =
-        "lowpass";
-
-      filter.frequency.value =
-        1700;
-
-
-      const gain =
-        audioContext.createGain();
-
-      gain.gain.value =
-        0.35;
-
-
-      source
-        .connect(filter)
-        .connect(gain)
-        .connect(masterGain);
-
-
-      source.start();
-
-      musicNodes.push(source);
-
-    }
-
-
-    function createPiano() {
-
-      /*
-         Slow repeating soft chords.
-      */
-
-      const notes = [
-        261.63,
-        329.63,
-        392.00,
-        493.88
-      ];
-
-
-      notes.forEach(
-        function (note, index) {
-
-          setTimeout(
-            function () {
-
-              if (!musicRunning) {
-                return;
-              }
-
-              makeOscillator(
-                note,
-                "sine",
-                0.025,
-                4
-              );
-
-            },
-            index * 700
-          );
-
-        }
-      );
-
-    }
-
-
-    function createNight() {
-
-      makeOscillator(
-        110,
-        "sine",
-        0.025,
-        30
-      );
-
-      makeOscillator(
-        164.81,
-        "sine",
-        0.012,
-        30
-      );
-
-    }
-
-
-    function createCafe() {
-
-      makeOscillator(
-        130.81,
-        "triangle",
-        0.018,
-        30
-      );
-
-      makeOscillator(
-        196,
-        "triangle",
-        0.012,
-        30
-      );
-
-      makeOscillator(
-        261.63,
-        "sine",
-        0.008,
-        30
-      );
-
-    }
-
-
-    function startMusic() {
-
-      const selected =
-        musicSelect.value;
+      const selection =
+        window.getSelection();
 
 
       if (
-        selected === "none"
+        !selection ||
+        selection.rangeCount === 0 ||
+        selection.isCollapsed
       ) {
 
-        stopMusic();
+        setMessage(
+          "Select some text first, then press Highlight."
+        );
 
         return;
 
       }
 
 
-      createAudioContext();
+      const range =
+        selection.getRangeAt(0);
 
 
-      if (
-        audioContext.state === "suspended"
-      ) {
-
-        audioContext.resume();
-
-      }
-
-
-      stopMusic();
-
-
-      musicRunning = true;
-
-
-      if (selected === "rain") {
-
-        createRain();
-
-      }
-
-      else if (
-        selected === "piano"
-      ) {
-
-        createPiano();
-
-      }
-
-      else if (
-        selected === "night"
-      ) {
-
-        createNight();
-
-      }
-
-      else if (
-        selected === "cafe"
-      ) {
-
-        createCafe();
-
-      }
-
-
-      musicPlay.textContent =
-        "⏸";
-
-    }
-
-
-    musicPlay.addEventListener(
-      "click",
-      function () {
-
-        if (musicRunning) {
-
-          stopMusic();
-
-        }
-
-        else {
-
-          startMusic();
-
-        }
-
-      }
-    );
-
-
-    musicSelect.addEventListener(
-      "change",
-      function () {
-
-        if (
-          this.value === "none"
-        ) {
-
-          stopMusic();
-
-          return;
-
-        }
-
-
-        startMusic();
-
-      }
-    );
-
-
-    musicVolume.addEventListener(
-      "input",
-      function () {
-
-        if (masterGain) {
-
-          masterGain.gain.value =
-            Number(
-              this.value
-            );
-
-        }
-
-      }
-    );
-
-
-    /* =======================================================
-       GET BOOK ID
-    ======================================================== */
-
-    const params =
-      new URLSearchParams(
-        window.location.search
-      );
-
-    const bookId =
-      params.get("id");
-
-
-    /* =======================================================
-       LOAD BOOK
-    ======================================================== */
-
-    async function loadBook() {
-
-      if (!bookId) {
-
-        showError(
-          "No book was selected."
+      const mark =
+        document.createElement(
+          "mark"
         );
-
-        return;
-      }
 
 
       try {
 
-        const {
-          data: book,
-          error
-        } = await supabaseClient
-          .from("books")
-          .select("*")
-          .eq("id", bookId)
-          .single();
-
-
-        if (error) {
-
-          throw error;
-
-        }
-
-
-        if (!book) {
-
-          showError(
-            "This book could not be found."
-          );
-
-          return;
-
-        }
-
-
-        titleElement.textContent =
-          book.title ||
-          "Untitled";
-
-
-        authorElement.textContent =
-          "By " +
-          (
-            book.author ||
-            "Unknown Author"
-          );
-
-
-        if (!book.book_url) {
-
-          showError(
-            "This book does not have a readable file."
-          );
-
-          return;
-
-        }
-
-
-        contentElement.innerHTML = `
-          <div class="loading-message">
-            Opening book...
-          </div>
-        `;
-
-
-        const response =
-          await fetch(
-            book.book_url
-          );
-
-
-        if (!response.ok) {
-
-          throw new Error(
-            "Could not download the book file."
-          );
-
-        }
-
-
-        const arrayBuffer =
-          await response.arrayBuffer();
-
-
-        const result =
-          await mammoth.convertToHtml({
-            arrayBuffer:
-              arrayBuffer
-          });
-
-
-        contentElement.innerHTML =
-          result.value;
-
-
-        document.title =
-          `${book.title} — OpenShelf`;
-
-      }
-
-
-      catch (error) {
-
-        console.error(
-          "Reader error:",
-          error
+        range.surroundContents(
+          mark
         );
 
-        showError(
-          "Sorry, this book could not be opened."
+        selection.removeAllRanges();
+
+      } catch {
+
+        setMessage(
+          "That selection cannot be highlighted."
         );
 
       }
 
     }
+  );
 
 
-    /* =======================================================
-       ERROR
-    ======================================================== */
 
-    function showError(message) {
+/* =========================================================
+   RTF → TEXT
+   ========================================================= */
 
-      titleElement.textContent =
-        "Unable to open book";
+function rtfToPlainText(rtf) {
 
-      authorElement.textContent =
-        "";
-
-      contentElement.innerHTML = `
-
-        <div class="error-message">
-
-          <p>
-            ${message}
-          </p>
-
-          <p>
-
-            <button
-              class="back-button"
-              onclick="window.location.href='index.html'">
-
-              ← Return to Library
-
-            </button>
-
-          </p>
-
-        </div>
-
-      `;
-
-    }
+  let text = rtf;
 
 
-    /* =======================================================
-       READING PROGRESS
-    ======================================================== */
+  /* Hex characters */
 
-    window.addEventListener(
-      "scroll",
-      function () {
-
-        const scrollTop =
-          window.scrollY;
-
-        const documentHeight =
-          document.documentElement
-            .scrollHeight -
-          window.innerHeight;
+  text =
+    text.replace(
+      /\\'[0-9a-fA-F]{2}/g,
+      match =>
+        String.fromCharCode(
+          parseInt(
+            match.slice(2),
+            16
+          )
+        )
+    );
 
 
-        const progress =
-          documentHeight > 0
-            ? (
-                scrollTop /
-                documentHeight
-              ) * 100
-            : 0;
+  /* Paragraphs */
+
+  text =
+    text.replace(
+      /\\par[d]?/g,
+      "\n"
+    );
 
 
-        progressBar.style.width =
-          progress + "%";
+  text =
+    text.replace(
+      /\\line/g,
+      "\n"
+    );
+
+
+  /* Tabs */
+
+  text =
+    text.replace(
+      /\\tab/g,
+      "\t"
+    );
+
+
+  /* Unicode */
+
+  text =
+    text.replace(
+      /\\u(-?\d+)\??/g,
+      (_, number) => {
+
+        const code =
+          Number(number);
+
+        return String.fromCharCode(
+          code < 0
+            ? code + 65536
+            : code
+        );
 
       }
     );
 
 
-    /* =======================================================
-       START
-    ======================================================== */
+  /* RTF commands */
 
-    loadBook();
+  text =
+    text.replace(
+      /\\[a-zA-Z]+-?\d* ?/g,
+      ""
+    );
 
-  </script>
+
+  /* Braces */
+
+  text =
+    text.replace(
+      /[{}]/g,
+      ""
+    );
+
+
+  return text
+    .replace(
+      /\n{3,}/g,
+      "\n\n"
+    )
+    .trim();
+
+}
+
+
+
+/* =========================================================
+   SIMPLE TEXT READER
+   ========================================================= */
+
+function showText(text) {
+
+  readerContent.innerHTML = "";
+
+
+  const article =
+    document.createElement(
+      "article"
+    );
+
+
+  article.className =
+    "reader-text";
+
+
+  article.textContent =
+    text;
+
+
+  readerContent.appendChild(
+    article
+  );
+
+
+  applyFontSize();
+
+}
+
+
+
+/* =========================================================
+   PDF
+   ========================================================= */
+
+async function renderPdf(url) {
+
+  readerContent.innerHTML = `
+
+    <iframe
+      class="pdf-reader"
+      src="${escapeHtml(url)}#toolbar=1&navpanes=0&view=FitH"
+      title="PDF reader"
+    ></iframe>
+
+  `;
+
+}
+
+
+
+/* =========================================================
+   DOCX
+   ========================================================= */
+
+async function renderDocx(url) {
+
+  const response =
+    await fetch(url);
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Could not download the DOCX file."
+    );
+
+  }
+
+
+  const arrayBuffer =
+    await response.arrayBuffer();
+
+
+  const result =
+    await mammoth.convertToHtml({
+      arrayBuffer
+    });
+
+
+  readerContent.innerHTML = `
+
+    <article class="reader-text docx-content">
+
+      ${result.value}
+
+    </article>
+
+  `;
+
+
+  applyFontSize();
+
+
+  if (
+    result.messages &&
+    result.messages.length
+  ) {
+
+    console.warn(
+      "DOCX conversion messages:",
+      result.messages
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   TXT
+   ========================================================= */
+
+async function renderTxt(url) {
+
+  const response =
+    await fetch(url);
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Could not download the TXT file."
+    );
+
+  }
+
+
+  const text =
+    await response.text();
+
+
+  showText(text);
+
+}
+
+
+
+/* =========================================================
+   RTF
+   ========================================================= */
+
+async function renderRtf(url) {
+
+  const response =
+    await fetch(url);
+
+
+  if (!response.ok) {
+
+    throw new Error(
+      "Could not download the RTF file."
+    );
+
+  }
+
+
+  const rtf =
+    await response.text();
+
+
+  const readable =
+    rtfToPlainText(rtf);
+
+
+  showText(readable);
+
+}
+
+
+
+/* =========================================================
+   EPUB
+   ========================================================= */
+
+async function renderEpub(url) {
+
+  readerContent.innerHTML = `
+
+    <div
+      id="epubReader"
+      class="epub-reader"
+    ></div>
+
+  `;
+
+
+  epubBook =
+    ePub(url);
+
+
+  epubRendition =
+    epubBook.renderTo(
+      "epubReader",
+      {
+
+        width: "100%",
+        height: "100%",
+        spread: "none"
+
+      }
+    );
+
+
+  await epubRendition.display();
+
+
+  epubRendition
+    .themes
+    .fontSize(
+      `${currentFontSize}px`
+    );
+
+
+  applyTheme(
+
+    localStorage.getItem(
+      "openshelf-reader-theme"
+    ) || "light"
+
+  );
+
+}
+
+
+
+/* =========================================================
+   FORMAT DISPATCHER
+   ========================================================= */
+
+async function openBookFile(url) {
+
+  const extension =
+    getExtension(url);
+
+
+  if (extension === "pdf") {
+
+    return renderPdf(url);
+
+  }
+
+
+  if (extension === "docx") {
+
+    return renderDocx(url);
+
+  }
+
+
+  if (extension === "epub") {
+
+    return renderEpub(url);
+
+  }
+
+
+  if (extension === "txt") {
+
+    return renderTxt(url);
+
+  }
+
+
+  if (extension === "rtf") {
+
+    return renderRtf(url);
+
+  }
+
+
+  throw new Error(
+    "Unsupported book format. Supported formats: PDF, DOCX, EPUB, TXT and RTF."
+  );
+
+}
+
+
+
+/* =========================================================
+   LOAD BOOK FROM SUPABASE
+   ========================================================= */
+
+async function loadBook() {
+
+  if (!bookId) {
+
+    bookTitle.textContent =
+      "Book not found";
+
+    setMessage(
+      "No book ID was provided.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  const {
+    data: book,
+    error
+  } = await supabaseClient
+
+    .from("books")
+
+    .select("*")
+
+    .eq(
+      "id",
+      bookId
+    )
+
+    .single();
+
+
+  if (
+    error ||
+    !book
+  ) {
+
+    console.error(error);
+
+
+    bookTitle.textContent =
+      "Book not found";
+
+
+    readerContent.innerHTML =
+      "";
+
+
+    setMessage(
+      "This book could not be loaded.",
+      "error"
+    );
+
+
+    return;
+
+  }
+
+
+  /* Book information */
+
+  bookTitle.textContent =
+    book.title ||
+    "Untitled";
+
+
+  bookMeta.textContent =
+    `${book.author || "Unknown author"}${
+      book.genre
+        ? " · " + book.genre
+        : ""
+    }`;
+
+
+  /* Original file */
+
+  openOriginal.href =
+    book.book_url;
+
+
+  try {
+
+    await openBookFile(
+      book.book_url
+    );
+
+
+    applyFontSize();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+
+    readerContent.innerHTML =
+      "";
+
+
+    setMessage(
+      `Could not open this book: ${
+        error.message ||
+        "Unknown error"
+      }`,
+      "error"
+    );
+
+  }
+
+}
+
+
+
+/* =========================================================
+   READING PROGRESS
+   ========================================================= */
+
+function updateProgress() {
+
+  const scrollable =
+    document.documentElement
+      .scrollHeight -
+    window.innerHeight;
+
+
+  if (scrollable <= 0) {
+
+    progressBar.style.width =
+      "100%";
+
+    return;
+
+  }
+
+
+  const percent =
+    Math.min(
+      100,
+      Math.max(
+        0,
+        (
+          window.scrollY /
+          scrollable
+        ) * 100
+      )
+    );
+
+
+  progressBar.style.width =
+    `${percent}%`;
+
+}
+
+
+window.addEventListener(
+  "scroll",
+  updateProgress
+);
+
+
+
+/* =========================================================
+   BACKGROUND MUSIC
+   ========================================================= */
+
+let audioContext = null;
+
+let masterGain = null;
+
+let musicTimer = null;
+
+let musicRunning = false;
+
+
+
+function ensureAudio() {
+
+  if (!audioContext) {
+
+    audioContext =
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+
+
+    masterGain =
+      audioContext.createGain();
+
+
+    masterGain.gain.value =
+      0.045;
+
+
+    masterGain.connect(
+      audioContext.destination
+    );
+
+  }
+
+
+  if (
+    audioContext.state ===
+    "suspended"
+  ) {
+
+    audioContext.resume();
+
+  }
+
+}
+
+
+
+function stopMusic() {
+
+  if (musicTimer) {
+
+    clearInterval(
+      musicTimer
+    );
+
+    musicTimer = null;
+
+  }
+
+
+  musicRunning = false;
+
+
+  document.getElementById(
+    "musicToggle"
+  ).textContent =
+    "Play music";
+
+}
+
+
+
+/* ---------- Rain ---------- */
+
+function createRain() {
+
+  const bufferSize =
+    audioContext.sampleRate * 2;
+
+
+  const buffer =
+    audioContext.createBuffer(
+      1,
+      bufferSize,
+      audioContext.sampleRate
+    );
+
+
+  const data =
+    buffer.getChannelData(0);
+
+
+  for (
+    let i = 0;
+    i < bufferSize;
+    i++
+  ) {
+
+    data[i] =
+      (
+        Math.random() * 2 - 1
+      ) * 0.25;
+
+  }
+
+
+  const source =
+    audioContext.createBufferSource();
+
+
+  const filter =
+    audioContext.createBiquadFilter();
+
+
+  const gain =
+    audioContext.createGain();
+
+
+  source.buffer =
+    buffer;
+
+
+  source.loop = true;
+
+
+  filter.type =
+    "lowpass";
+
+
+  filter.frequency.value =
+    3200;
+
+
+  gain.gain.value =
+    0.18;
+
+
+  source
+    .connect(filter)
+    .connect(gain)
+    .connect(masterGain);
+
+
+  source.start();
+
+
+  return source;
+
+}
+
+
+
+/* ---------- Night ---------- */
+
+function createDrone() {
+
+  const oscillator =
+    audioContext.createOscillator();
+
+
+  const gain =
+    audioContext.createGain();
+
+
+  oscillator.type =
+    "sine";
+
+
+  oscillator.frequency.value =
+    110;
+
+
+  gain.gain.value =
+    0.08;
+
+
+  oscillator
+    .connect(gain)
+    .connect(masterGain);
+
+
+  oscillator.start();
+
+
+  return oscillator;
+
+}
+
+
+
+/* ---------- Start ---------- */
+
+function startMusic(type) {
+
+  ensureAudio();
+
+  stopMusic();
+
+
+  if (type === "none") {
+
+    return;
+
+  }
+
+
+  /* Rain */
+
+  if (type === "rain") {
+
+    createRain();
+
+    musicRunning = true;
+
+  }
+
+
+  /* Night */
+
+  if (type === "night") {
+
+    createDrone();
+
+    musicRunning = true;
+
+  }
+
+
+  /* Piano / Café */
+
+  if (
+    type === "piano" ||
+    type === "cafe"
+  ) {
+
+    const notes =
+      type === "piano"
+
+        ? [
+            261.63,
+            329.63,
+            392.00,
+            329.63
+          ]
+
+        : [
+            196.00,
+            246.94,
+            293.66,
+            246.94
+          ];
+
+
+    let index = 0;
+
+
+    function playNote() {
+
+      const oscillator =
+        audioContext
+          .createOscillator();
+
+
+      const gain =
+        audioContext
+          .createGain();
+
+
+      oscillator.type =
+        type === "piano"
+          ? "triangle"
+          : "sine";
+
+
+      oscillator.frequency.value =
+        notes[
+          index %
+          notes.length
+        ];
+
+
+      gain.gain.setValueAtTime(
+        0.0001,
+        audioContext.currentTime
+      );
+
+
+      gain.gain.exponentialRampToValueAtTime(
+        type === "piano"
+          ? 0.16
+          : 0.08,
+        audioContext.currentTime +
+          0.03
+      );
+
+
+      gain.gain.exponentialRampToValueAtTime(
+        0.0001,
+        audioContext.currentTime +
+          1.4
+      );
+
+
+      oscillator
+        .connect(gain)
+        .connect(masterGain);
+
+
+      oscillator.start();
+
+
+      oscillator.stop(
+        audioContext.currentTime +
+        1.45
+      );
+
+
+      index++;
+
+    }
+
+
+    playNote();
+
+
+    musicTimer =
+      setInterval(
+        playNote,
+        type === "piano"
+          ? 1500
+          : 1000
+      );
+
+
+    musicRunning = true;
+
+  }
+
+
+  document.getElementById(
+    "musicToggle"
+  ).textContent =
+    "Stop music";
+
+}
+
+
+
+/* =========================================================
+   MUSIC EVENTS
+   ========================================================= */
+
+document
+  .getElementById(
+    "musicSelect"
+  )
+  .addEventListener(
+    "change",
+    event => {
+
+      startMusic(
+        event.target.value
+      );
+
+    }
+  );
+
+
+
+document
+  .getElementById(
+    "musicToggle"
+  )
+  .addEventListener(
+    "click",
+    () => {
+
+      const select =
+        document.getElementById(
+          "musicSelect"
+        );
+
+
+      if (musicRunning) {
+
+        stopMusic();
+
+      } else {
+
+        startMusic(
+          select.value
+        );
+
+      }
+
+    }
+  );
+
+
+
+/* =========================================================
+   START READER
+   ========================================================= */
+
+initThemes();
+
+loadBook();
+
+</script>
 
 </body>
-
 </html>
