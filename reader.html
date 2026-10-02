@@ -1,1490 +1,369 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>The Order Within — OpenShelf</title>
+  <title>Reading — OpenShelf</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:wght@500;600;700&display=swap"
-    rel="stylesheet"
-  >
-
-  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js"></script>
+  <link rel="stylesheet" href="style.css">
 
   <style>
+    /* =========================
+       READER PAGE
+       ========================= */
 
-    * {
-      box-sizing: border-box;
+    .reader-page {
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
     }
 
-    html {
-      scroll-behavior: smooth;
-    }
-
-    body {
-      margin: 0;
-      background:
-        radial-gradient(circle at 15% 10%, rgba(201,120,85,.08), transparent 28%),
-        radial-gradient(circle at 85% 70%, rgba(91,111,94,.07), transparent 30%),
-        #10100f;
-      color: #e9e4dc;
-      font-family: "DM Sans", sans-serif;
-    }
-
-    ::selection {
-      background: #c97855;
-      color: #fff;
-    }
-
-    .reader-bar {
+    .reader-header {
       position: sticky;
       top: 0;
       z-index: 1000;
-      height: 68px;
+
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 28px;
-      background: rgba(16,16,15,.92);
-      backdrop-filter: blur(18px);
-      border-bottom: 1px solid rgba(255,255,255,.07);
+      gap: 20px;
+
+      padding: 14px 5%;
+
+      background: color-mix(
+        in srgb,
+        var(--bg) 90%,
+        transparent
+      );
+
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
     }
 
-    .reader-left,
-    .reader-right {
+    .reader-left {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+    }
+
+    .back-button {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+
+      padding: 9px 15px;
+      border-radius: 12px;
+
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    .back-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .reader-title {
+      font-family: Georgia, serif;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .reader-controls {
       display: flex;
       align-items: center;
       gap: 10px;
     }
 
-    .back {
-      color: #bcb6ae;
-      text-decoration: none;
-      font-size: 14px;
-    }
+    .reader-theme {
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
 
-    .back:hover {
-      color: #fff;
-    }
-
-    .reader-title {
-      margin-left: 12px;
-      padding-left: 18px;
-      border-left: 1px solid #393633;
-      font-size: 14px;
-      color: #e8e2da;
-    }
-
-    button,
-    select {
-      font-family: inherit;
-    }
-
-    .tool-btn,
-    .chapter-select {
-      border: 1px solid #393633;
-      background: #191817;
-      color: #d9d3cb;
-      border-radius: 9px;
       padding: 9px 12px;
-      cursor: pointer;
-    }
-
-    .tool-btn:hover,
-    .chapter-select:hover {
-      border-color: #8f6655;
-      color: #fff;
-    }
-
-    .progress {
-      position: fixed;
-      top: 68px;
-      left: 0;
-      height: 3px;
-      width: 0%;
-      background: #c97855;
-      z-index: 1100;
-    }
-
-    .hero {
-      max-width: 920px;
-      margin: 0 auto;
-      padding: 110px 25px 80px;
-      text-align: center;
-    }
-
-    .eyebrow {
-      color: #c97855;
-      letter-spacing: .18em;
-      font-size: 11px;
-      font-weight: 700;
-    }
-
-    .hero h1 {
-      margin: 18px 0 15px;
-      font-family: "Playfair Display", serif;
-      font-size: clamp(42px, 7vw, 76px);
-      line-height: 1;
-      font-weight: 600;
-    }
-
-    .hero p {
-      color: #99938c;
-      max-width: 600px;
-      margin: 0 auto;
-      line-height: 1.8;
-    }
-
-    .reader-wrap {
-      width: min(820px, calc(100% - 40px));
-      margin: 0 auto;
-      transition: max-width .3s ease;
-    }
-
-    .reader-wrap.wide {
-      max-width: 1050px;
-    }
-
-    .book-content {
-      font-family: "Playfair Display", serif;
-      font-size: 20px;
-      line-height: 1.9;
-      color: #dcd5cd;
-      padding-bottom: 160px;
-    }
-
-    .book-content p {
-      margin: 0 0 1.35em;
-    }
-
-    .book-content h1,
-    .book-content h2,
-    .book-content h3 {
-      color: #f3eee7;
-      font-family: "Playfair Display", serif;
-      font-weight: 600;
-      scroll-margin-top: 100px;
-    }
-
-    .book-content h1 {
-      margin-top: 100px;
-      margin-bottom: 35px;
-      font-size: 38px;
-      color: #c97855;
-    }
-
-    .book-content h2 {
-      margin-top: 85px;
-      margin-bottom: 30px;
-      font-size: 32px;
-    }
-
-    .book-content h3 {
-      margin-top: 65px;
-      margin-bottom: 25px;
-      font-size: 27px;
-    }
-
-    .book-content img {
-      max-width: 100%;
-      display: block;
-      margin: 35px auto;
-      border-radius: 10px;
-    }
-
-    .book-content blockquote {
-      border-left: 3px solid #c97855;
-      margin: 35px 0;
-      padding-left: 25px;
-      color: #aaa39b;
-    }
-
-    mark.user-highlight {
-      background: rgba(201,120,85,.35);
-      color: inherit;
-      border-radius: 3px;
-      padding: 1px 2px;
-      cursor: pointer;
-    }
-
-    mark.comment-highlight {
-      background: rgba(130,155,132,.28);
-      border-bottom: 2px solid #8aa38c;
-      color: inherit;
-      cursor: pointer;
-    }
-
-    .loading {
-      text-align: center;
-      padding: 80px 20px;
-      color: #9c968f;
-      font-family: "DM Sans", sans-serif;
-    }
-
-    .loading strong {
-      display: block;
-      color: #e9e4dc;
-      margin-bottom: 8px;
-    }
-
-    .error {
-      color: #d68c72;
-      background: rgba(201,120,85,.08);
-      border: 1px solid rgba(201,120,85,.25);
       border-radius: 12px;
-      padding: 25px;
-      font-family: "DM Sans", sans-serif;
+
+      cursor: pointer;
+      font-size: 14px;
     }
 
-    .end {
-      text-align: center;
-      padding: 100px 20px 140px;
-      border-top: 1px solid #292725;
+    .reader-container {
+      width: min(850px, 90%);
+      margin: 0 auto;
+      padding: 55px 0 100px;
     }
 
-    .end h2 {
-      font-family: "Playfair Display", serif;
-      font-size: 42px;
+    .reader-book-title {
+      font-family: Georgia, serif;
+      font-size: clamp(34px, 5vw, 60px);
+      line-height: 1.05;
       margin-bottom: 12px;
     }
 
-    .end p {
-      color: #85807a;
+    .reader-author {
+      color: var(--muted);
+      margin-bottom: 45px;
     }
 
-    .settings {
+    .progress-wrapper {
       position: fixed;
-      right: 25px;
-      top: 82px;
-      z-index: 900;
-      width: 290px;
-      padding: 22px;
-      background: #191817;
-      border: 1px solid #393633;
-      border-radius: 14px;
-      box-shadow: 0 25px 70px rgba(0,0,0,.45);
-      display: none;
-      font-family: "DM Sans", sans-serif;
-    }
-
-    .settings.open {
-      display: block;
-    }
-
-    .settings h3 {
-      margin: 0 0 18px;
-      font-size: 15px;
-    }
-
-    .setting {
-      margin-bottom: 18px;
-    }
-
-    .setting label {
-      display: block;
-      color: #99938c;
-      font-size: 12px;
-      margin-bottom: 7px;
-    }
-
-    .setting button {
-      margin-right: 5px;
-      border: 1px solid #393633;
-      background: #11100f;
-      color: #d6d0c8;
-      border-radius: 7px;
-      padding: 7px 10px;
-      cursor: pointer;
-    }
-
-    .setting button:hover {
-      border-color: #c97855;
-    }
-
-    .selection-tools {
-      position: fixed;
-      z-index: 1200;
-      display: none;
-      gap: 5px;
-      padding: 6px;
-      background: #211f1d;
-      border: 1px solid #494440;
-      border-radius: 9px;
-      box-shadow: 0 15px 35px rgba(0,0,0,.4);
-    }
-
-    .selection-tools.show {
-      display: flex;
-    }
-
-    .selection-tools button {
-      border: 0;
-      border-radius: 6px;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      z-index: 2000;
       background: transparent;
-      color: #eee;
-      padding: 7px 9px;
-      cursor: pointer;
     }
 
-    .selection-tools button:hover {
-      background: #35312e;
+    #progressBar {
+      width: 0%;
+      height: 100%;
+      background: var(--accent);
+      transition: width .1s linear;
     }
 
-    .notes-panel {
-      position: fixed;
-      right: 25px;
-      bottom: 25px;
-      z-index: 800;
-      width: 310px;
-      max-height: 380px;
-      overflow-y: auto;
-      background: #191817;
-      border: 1px solid #393633;
-      border-radius: 14px;
-      padding: 18px;
-      display: none;
-      font-family: "DM Sans", sans-serif;
-      box-shadow: 0 20px 60px rgba(0,0,0,.5);
+    #readerContent {
+      font-family: Georgia, serif;
+      font-size: 19px;
+      line-height: 1.9;
     }
 
-    .notes-panel.open {
-      display: block;
+    #readerContent h1,
+    #readerContent h2,
+    #readerContent h3 {
+      font-family: Georgia, serif;
+      margin-top: 55px;
+      margin-bottom: 20px;
     }
 
-    .notes-panel h3 {
-      margin: 0 0 15px;
-      font-size: 15px;
+    #readerContent p {
+      margin-bottom: 22px;
     }
 
-    .note {
-      padding: 13px 0;
-      border-top: 1px solid #302d2a;
+    #readerContent img {
+      max-width: 100%;
+      height: auto;
     }
 
-    .note-text {
-      color: #ded8d0;
-      font-size: 13px;
-      line-height: 1.5;
-    }
+    @media (max-width: 700px) {
 
-    .note-date {
-      color: #77716b;
-      font-size: 10px;
-      margin-top: 6px;
-    }
-
-    .empty-notes {
-      color: #77716b;
-      font-size: 13px;
-    }
-
-    .focus-mode .reader-bar {
-      opacity: .35;
-      transition: opacity .3s;
-    }
-
-    .focus-mode .reader-bar:hover {
-      opacity: 1;
-    }
-
-    .focus-mode .hero {
-      padding-top: 55px;
-    }
-
-    @media(max-width:700px) {
-
-      .reader-bar {
-        padding: 0 14px;
+      .reader-header {
+        padding: 12px 4%;
       }
 
       .reader-title {
         display: none;
       }
 
-      .reader-right {
-        gap: 5px;
+      .reader-container {
+        width: 90%;
+        padding-top: 35px;
       }
 
-      .chapter-select {
-        max-width: 120px;
-      }
-
-      .reader-wrap {
-        width: min(100% - 28px, 820px);
-      }
-
-      .book-content {
-        font-size: 18px;
+      #readerContent {
+        font-size: 17px;
         line-height: 1.8;
       }
-
-      .settings,
-      .notes-panel {
-        right: 12px;
-        width: calc(100% - 24px);
-      }
-
     }
-
   </style>
 </head>
 
-<body>
+<body class="reader-page">
 
-  <div class="progress" id="progress"></div>
+  <div class="progress-wrapper">
+    <div id="progressBar"></div>
+  </div>
 
-  <header class="reader-bar">
+  <!-- HEADER -->
+
+  <header class="reader-header">
 
     <div class="reader-left">
-      <a class="back" href="index.html">← Library</a>
-      <span class="reader-title">The Order Within</span>
+
+      <button
+        class="back-button"
+        onclick="window.location.href='index.html'">
+        ← Library
+      </button>
+
+      <div class="reader-title">
+        OpenShelf
+      </div>
+
     </div>
 
-    <div class="reader-right">
+    <!-- THEME SELECTOR -->
 
-      <select class="chapter-select" id="chapterSelect">
-        <option value="">Chapters</option>
+    <div class="reader-controls">
+
+      <select id="readerTheme" class="reader-theme">
+        <option value="light">☀️ Light</option>
+        <option value="cozy">📚 Cozy Library</option>
+        <option value="cafe">☕ Café & Books</option>
+        <option value="editorial">📰 Editorial</option>
       </select>
-
-      <button class="tool-btn" id="notesButton">
-        Notes
-      </button>
-
-      <button class="tool-btn" id="settingsButton">
-        Aa
-      </button>
-
-      <button class="tool-btn" id="focusButton">
-        Focus
-      </button>
 
     </div>
 
   </header>
 
 
-  <div class="settings" id="settings">
+  <!-- BOOK -->
 
-    <h3>Reading settings</h3>
+  <main class="reader-container">
 
-    <div class="setting">
-      <label>Text size</label>
+    <h1 class="reader-book-title">
+      The Order Within
+    </h1>
 
-      <button id="smaller">A−</button>
-      <button id="normal">A</button>
-      <button id="larger">A+</button>
+    <div class="reader-author">
+      By Nikender Singh
     </div>
 
-    <div class="setting">
-      <label>Reading width</label>
-
-      <button id="normalWidth">Normal</button>
-      <button id="wideWidth">Wide</button>
-    </div>
-
-    <div class="setting">
-      <label>Line spacing</label>
-
-      <button id="tightLines">Tight</button>
-      <button id="normalLines">Normal</button>
-      <button id="looseLines">Loose</button>
-    </div>
-
-  </div>
-
-
-  <div class="selection-tools" id="selectionTools">
-
-    <button id="highlightButton">
-      🖍 Highlight
-    </button>
-
-    <button id="commentButton">
-      💬 Comment
-    </button>
-
-  </div>
-
-
-  <div class="notes-panel" id="notesPanel">
-
-    <h3>Your notes</h3>
-
-    <div id="notesList"></div>
-
-  </div>
-
-
-  <section class="hero">
-
-    <div class="eyebrow">
-      OPENSHELF • PSYCHOLOGICAL THRILLER
-    </div>
-
-    <h1>The Order Within</h1>
-
-    <p>
-      A continuous reading experience for the complete novel.
-    </p>
-
-  </section>
-
-
-  <main class="reader-wrap" id="readerWrap">
-
-    <article class="book-content" id="bookContent">
-
-      <div class="loading" id="loading">
-
-        <strong>Opening The Order Within...</strong>
-
-        Loading the manuscript.
-
-      </div>
-
+    <article id="readerContent">
+      Loading book...
     </article>
 
   </main>
 
 
-  <section class="end">
+  <!-- MAMMOTH -->
 
-    <h2>The End</h2>
-
-    <p>Thank you for reading The Order Within.</p>
-
-    <a class="back" href="index.html">
-      ← Return to OpenShelf
-    </a>
-
-  </section>
+  <script src="https://cdn.jsdelivr.net/npm/mammoth@1.13.0/mammoth.browser.min.js"></script>
 
 
-<script>
+  <script>
 
-  /*
-    YOUR ACTUAL BOOK FILE
-  */
-
-  const BOOK_FILE =
-    "THE%20ORDER%20WITHIN%20%281%29.docx";
+    const themeSelector =
+      document.getElementById("readerTheme");
 
 
-  const bookContent =
-    document.getElementById("bookContent");
+    // =========================
+    // LOAD SAVED THEME
+    // =========================
 
-  const loading =
-    document.getElementById("loading");
+    const savedTheme =
+      localStorage.getItem("openshelf-theme") || "light";
 
-  const progress =
-    document.getElementById("progress");
+    document.body.setAttribute(
+      "data-theme",
+      savedTheme
+    );
 
-  const settings =
-    document.getElementById("settings");
-
-  const settingsButton =
-    document.getElementById("settingsButton");
-
-  const focusButton =
-    document.getElementById("focusButton");
-
-  const chapterSelect =
-    document.getElementById("chapterSelect");
-
-  const selectionTools =
-    document.getElementById("selectionTools");
-
-  const notesPanel =
-    document.getElementById("notesPanel");
-
-  const notesList =
-    document.getElementById("notesList");
-
-  const readerWrap =
-    document.getElementById("readerWrap");
+    themeSelector.value = savedTheme;
 
 
-  /*
-    LOAD DOCX
-  */
+    // =========================
+    // CHANGE THEME
+    // =========================
 
-  async function loadBook() {
+    themeSelector.addEventListener(
+      "change",
+      function () {
 
-    try {
+        const theme =
+          this.value;
 
-      const response =
-        await fetch(BOOK_FILE);
-
-      if (!response.ok) {
-        throw new Error(
-          "Could not find the DOCX file."
+        document.body.setAttribute(
+          "data-theme",
+          theme
         );
+
+        // Save it so homepage
+        // uses the same theme too
+
+        localStorage.setItem(
+          "openshelf-theme",
+          theme
+        );
+
       }
-
-      const arrayBuffer =
-        await response.arrayBuffer();
-
-
-      const result =
-        await mammoth.convertToHtml(
-          {
-            arrayBuffer: arrayBuffer
-          }
-        );
-
-
-      bookContent.innerHTML =
-        result.value;
-
-
-      cleanBookHTML();
-
-      createChapterNavigation();
-
-      loadSavedAnnotations();
-
-    }
-
-    catch (error) {
-
-      console.error(error);
-
-      bookContent.innerHTML = `
-
-        <div class="error">
-
-          <strong>
-            The book could not be loaded.
-          </strong>
-
-          <p>
-            Check that
-            <b>THE ORDER WITHIN (1).docx</b>
-            is in the root of your GitHub repository.
-          </p>
-
-          <p>
-            Then refresh this page.
-          </p>
-
-        </div>
-
-      `;
-
-    }
-
-  }
-
-
-  /*
-    BASIC SECURITY CLEANUP
-  */
-
-  function cleanBookHTML() {
-
-    const dangerous =
-      bookContent.querySelectorAll(
-        "script, iframe, object, embed"
-      );
-
-    dangerous.forEach(
-      element => element.remove()
     );
 
 
-    bookContent
-      .querySelectorAll("*")
-      .forEach(element => {
+    // =========================
+    // LOAD BOOK
+    // =========================
 
-        [...element.attributes]
-          .forEach(attribute => {
+    const content =
+      document.getElementById("readerContent");
 
-            if (
-              attribute.name.startsWith("on")
-            ) {
-              element.removeAttribute(
-                attribute.name
-              );
-            }
+    fetch(
+      "THE%20ORDER%20WITHIN%20(1).docx"
+    )
 
-          });
+      .then(response => {
 
-
-        if (
-          element.tagName === "A" &&
-          element.getAttribute("href")
-        ) {
-
-          const href =
-            element.getAttribute("href");
-
-          if (
-            href.toLowerCase()
-              .startsWith("javascript:")
-          ) {
-
-            element.removeAttribute("href");
-
-          }
-
+        if (!response.ok) {
+          throw new Error(
+            "Could not load the book."
+          );
         }
 
-      });
+        return response.arrayBuffer();
 
-  }
+      })
 
+      .then(arrayBuffer => {
 
-  /*
-    CHAPTER NAVIGATION
-  */
-
-  function createChapterNavigation() {
-
-    const headings =
-      bookContent.querySelectorAll(
-        "h1, h2, h3, p"
-      );
-
-
-    let chapterNumber = 0;
-
-
-    headings.forEach(element => {
-
-      const text =
-        element.textContent.trim();
-
-
-      const match =
-        text.match(
-          /^Chapter\s+(\d+)/i
-        );
-
-
-      if (!match) return;
-
-
-      chapterNumber++;
-
-      const number =
-        match[1];
-
-      const id =
-        "chapter-" + number;
-
-
-      element.id = id;
-
-
-      const option =
-        document.createElement("option");
-
-
-      option.value = id;
-
-      option.textContent =
-        "Chapter " + number;
-
-
-      chapterSelect.appendChild(option);
-
-    });
-
-  }
-
-
-  chapterSelect.addEventListener(
-    "change",
-    function() {
-
-      if (!this.value) return;
-
-      const target =
-        document.getElementById(
-          this.value
-        );
-
-      if (target) {
-
-        target.scrollIntoView({
-          behavior: "smooth",
-          block: "start"
+        return mammoth.convertToHtml({
+          arrayBuffer: arrayBuffer
         });
 
-      }
+      })
 
-      this.value = "";
+      .then(result => {
 
-    }
-  );
+        content.innerHTML =
+          result.value;
 
+      })
 
-  /*
-    SETTINGS
-  */
+      .catch(error => {
 
-  settingsButton.addEventListener(
-    "click",
-    () => {
+        content.innerHTML = `
+          <p>
+            Sorry, the book could not be loaded.
+          </p>
+          <p>
+            Please refresh the page and try again.
+          </p>
+        `;
 
-      settings.classList.toggle("open");
-
-    }
-  );
-
-
-  let textSize = 20;
-
-  const savedSize =
-    localStorage.getItem(
-      "openshelfTextSize"
-    );
-
-  if (savedSize) {
-    textSize = Number(savedSize);
-  }
-
-  bookContent.style.fontSize =
-    textSize + "px";
-
-
-  document
-    .getElementById("smaller")
-    .onclick = () => {
-
-      textSize =
-        Math.max(16, textSize - 1);
-
-      updateTextSize();
-
-    };
-
-
-  document
-    .getElementById("normal")
-    .onclick = () => {
-
-      textSize = 20;
-
-      updateTextSize();
-
-    };
-
-
-  document
-    .getElementById("larger")
-    .onclick = () => {
-
-      textSize =
-        Math.min(28, textSize + 1);
-
-      updateTextSize();
-
-    };
-
-
-  function updateTextSize() {
-
-    bookContent.style.fontSize =
-      textSize + "px";
-
-    localStorage.setItem(
-      "openshelfTextSize",
-      textSize
-    );
-
-  }
-
-
-  document
-    .getElementById("normalWidth")
-    .onclick = () => {
-
-      readerWrap.classList.remove(
-        "wide"
-      );
-
-    };
-
-
-  document
-    .getElementById("wideWidth")
-    .onclick = () => {
-
-      readerWrap.classList.add(
-        "wide"
-      );
-
-    };
-
-
-  document
-    .getElementById("tightLines")
-    .onclick = () => {
-
-      bookContent.style.lineHeight =
-        "1.65";
-
-    };
-
-
-  document
-    .getElementById("normalLines")
-    .onclick = () => {
-
-      bookContent.style.lineHeight =
-        "1.9";
-
-    };
-
-
-  document
-    .getElementById("looseLines")
-    .onclick = () => {
-
-      bookContent.style.lineHeight =
-        "2.15";
-
-    };
-
-
-  /*
-    TRUE FULLSCREEN / FOCUS
-  */
-
-  focusButton.addEventListener(
-    "click",
-    async () => {
-
-      document.body.classList.toggle(
-        "focus-mode"
-      );
-
-
-      if (!document.fullscreenElement) {
-
-        try {
-
-          await document.documentElement
-            .requestFullscreen();
-
-        }
-
-        catch (error) {
-
-          console.log(
-            "Fullscreen unavailable."
-          );
-
-        }
-
-      }
-
-      else {
-
-        try {
-
-          await document.exitFullscreen();
-
-        }
-
-        catch (error) {}
-
-      }
-
-    }
-  );
-
-
-  /*
-    READING PROGRESS
-  */
-
-  window.addEventListener(
-    "scroll",
-    () => {
-
-      const scrollTop =
-        window.scrollY;
-
-      const pageHeight =
-        document.documentElement
-          .scrollHeight -
-        window.innerHeight;
-
-
-      const percentage =
-        pageHeight > 0
-          ? (scrollTop / pageHeight) * 100
-          : 0;
-
-
-      progress.style.width =
-        percentage + "%";
-
-    }
-  );
-
-
-  /*
-    TEXT SELECTION TOOLBAR
-  */
-
-  document.addEventListener(
-    "mouseup",
-    () => {
-
-      setTimeout(
-        showSelectionTools,
-        10
-      );
-
-    }
-  );
-
-
-  function showSelectionTools() {
-
-    const selection =
-      window.getSelection();
-
-
-    if (
-      !selection ||
-      selection.rangeCount === 0 ||
-      selection.isCollapsed
-    ) {
-
-      selectionTools.classList.remove(
-        "show"
-      );
-
-      return;
-
-    }
-
-
-    const range =
-      selection.getRangeAt(0);
-
-
-    if (
-      !bookContent.contains(
-        range.commonAncestorContainer
-      )
-    ) {
-
-      selectionTools.classList.remove(
-        "show"
-      );
-
-      return;
-
-    }
-
-
-    const rect =
-      range.getBoundingClientRect();
-
-
-    selectionTools.style.left =
-      Math.max(
-        10,
-        rect.left +
-        rect.width / 2 -
-        95
-      ) + "px";
-
-
-    selectionTools.style.top =
-      Math.max(
-        75,
-        rect.top - 48
-      ) + "px";
-
-
-    selectionTools.classList.add(
-      "show"
-    );
-
-  }
-
-
-  /*
-    HIGHLIGHT
-  */
-
-  document
-    .getElementById("highlightButton")
-    .addEventListener(
-      "click",
-      () => {
-
-        const selection =
-          window.getSelection();
-
-
-        if (
-          !selection ||
-          selection.rangeCount === 0
-        ) return;
-
-
-        const range =
-          selection.getRangeAt(0);
-
-
-        const selectedText =
-          selection.toString().trim();
-
-
-        if (!selectedText) return;
-
-
-        try {
-
-          const mark =
-            document.createElement("mark");
-
-
-          mark.className =
-            "user-highlight";
-
-
-          mark.textContent =
-            selectedText;
-
-
-          range.deleteContents();
-
-          range.insertNode(mark);
-
-
-          saveHighlight(
-            selectedText
-          );
-
-        }
-
-        catch (error) {
-
-          alert(
-            "That selection is too complex to highlight. Try selecting a smaller piece of text."
-          );
-
-        }
-
-
-        selection.removeAllRanges();
-
-        selectionTools.classList.remove(
-          "show"
-        );
-
-      }
-    );
-
-
-  /*
-    COMMENTS
-  */
-
-  document
-    .getElementById("commentButton")
-    .addEventListener(
-      "click",
-      () => {
-
-        const selection =
-          window.getSelection();
-
-
-        if (
-          !selection ||
-          selection.rangeCount === 0
-        ) return;
-
-
-        const selectedText =
-          selection.toString().trim();
-
-
-        if (!selectedText) return;
-
-
-        const comment =
-          prompt(
-            "Write your comment:"
-          );
-
-
-        if (
-          comment === null ||
-          !comment.trim()
-        ) return;
-
-
-        const range =
-          selection.getRangeAt(0);
-
-
-        try {
-
-          const mark =
-            document.createElement("mark");
-
-
-          mark.className =
-            "comment-highlight";
-
-
-          mark.textContent =
-            selectedText;
-
-
-          range.deleteContents();
-
-          range.insertNode(mark);
-
-
-          saveNote(
-            selectedText,
-            comment
-          );
-
-        }
-
-        catch (error) {
-
-          alert(
-            "That selection is too complex. Try selecting a smaller piece of text."
-          );
-
-        }
-
-
-        selection.removeAllRanges();
-
-        selectionTools.classList.remove(
-          "show"
-        );
-
-      }
-    );
-
-
-  /*
-    LOCAL HIGHLIGHTS
-  */
-
-  function saveHighlight(text) {
-
-    const highlights =
-      JSON.parse(
-        localStorage.getItem(
-          "openshelfHighlights"
-        ) || "[]"
-      );
-
-
-    highlights.push({
-      text: text,
-      time: Date.now()
-    });
-
-
-    localStorage.setItem(
-      "openshelfHighlights",
-      JSON.stringify(highlights)
-    );
-
-  }
-
-
-  /*
-    LOCAL COMMENTS
-  */
-
-  function saveNote(
-    selectedText,
-    comment
-  ) {
-
-    const notes =
-      JSON.parse(
-        localStorage.getItem(
-          "openshelfNotes"
-        ) || "[]"
-      );
-
-
-    notes.push({
-
-      selectedText:
-        selectedText,
-
-      comment:
-        comment,
-
-      time:
-        Date.now()
-
-    });
-
-
-    localStorage.setItem(
-      "openshelfNotes",
-      JSON.stringify(notes)
-    );
-
-
-    renderNotes();
-
-  }
-
-
-  /*
-    NOTES PANEL
-  */
-
-  document
-    .getElementById("notesButton")
-    .addEventListener(
-      "click",
-      () => {
-
-        notesPanel.classList.toggle(
-          "open"
-        );
-
-        renderNotes();
-
-      }
-    );
-
-
-  function renderNotes() {
-
-    const notes =
-      JSON.parse(
-        localStorage.getItem(
-          "openshelfNotes"
-        ) || "[]"
-      );
-
-
-    if (notes.length === 0) {
-
-      notesList.innerHTML =
-        `<div class="empty-notes">
-          No comments yet.
-        </div>`;
-
-      return;
-
-    }
-
-
-    notesList.innerHTML = "";
-
-
-    notes
-      .slice()
-      .reverse()
-      .forEach(note => {
-
-        const div =
-          document.createElement("div");
-
-
-        div.className = "note";
-
-
-        const text =
-          document.createElement("div");
-
-        text.className =
-          "note-text";
-
-
-        text.textContent =
-          "“" +
-          note.selectedText +
-          "”";
-
-
-        const comment =
-          document.createElement("div");
-
-        comment.className =
-          "note-text";
-
-
-        comment.style.marginTop =
-          "7px";
-
-
-        comment.textContent =
-          note.comment;
-
-
-        const date =
-          document.createElement("div");
-
-        date.className =
-          "note-date";
-
-
-        date.textContent =
-          new Date(
-            note.time
-          ).toLocaleString();
-
-
-        div.appendChild(text);
-
-        div.appendChild(comment);
-
-        div.appendChild(date);
-
-
-        notesList.appendChild(div);
+        console.error(error);
 
       });
 
-  }
 
+    // =========================
+    // READING PROGRESS
+    // =========================
 
-  /*
-    RELOAD SAVED ANNOTATIONS
-  */
+    window.addEventListener(
+      "scroll",
+      function () {
 
-  function loadSavedAnnotations() {
+        const scrollTop =
+          window.scrollY;
 
-    /*
-      We intentionally keep annotations
-      local to the reader/browser.
-      They are not publicly shared.
-    */
+        const documentHeight =
+          document.documentElement.scrollHeight
+          - window.innerHeight;
 
-    renderNotes();
+        const progress =
+          documentHeight > 0
+            ? (scrollTop / documentHeight) * 100
+            : 0;
 
-  }
+        document.getElementById(
+          "progressBar"
+        ).style.width =
+          progress + "%";
 
+      }
+    );
 
-  /*
-    START
-  */
-
-  loadBook();
-
-</script>
+  </script>
 
 </body>
 </html>
