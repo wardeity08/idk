@@ -1,234 +1,310 @@
-const defaultBooks = [
+/* =========================================================
+   OPENSHELF — THEME SYSTEM
+   ========================================================= */
 
-  {
-    title:"The Last Train",
-    author:"Mara Ellis",
-    genre:"Mystery",
-    cover:"mystery",
-    description:"A missing passenger, an empty station, and one final train.",
-    link:"reader.html?book=last-train"
-  },
-
-  {
-    title:"The House With No Clock",
-    author:"Eli Mercer",
-    genre:"Fantasy",
-    cover:"fantasy",
-    description:"A mysterious house appears at midnight.",
-    link:"reader.html?book=house"
-  },
-
-  {
-    title:"Letters From Tomorrow",
-    author:"Noah Vale",
-    genre:"Sci-Fi",
-    cover:"scifi",
-    description:"A student receives letters written by his future self.",
-    link:"reader.html?book=letters"
-  },
-
-  {
-    title:"The Order Within",
-    author:"Nikender Singh",
-    genre:"Psychological Thriller",
-    cover:"mystery",
-    description:"A psychological thriller about trust, hidden motives, and a cold case.",
-    link:"reader.html?book=order-within"
-  }
-
+const THEMES = [
+  "light",
+  "cozy",
+  "cafe",
+  "editorial"
 ];
 
+const THEME_KEY = "openshelf-theme";
 
-const booksContainer = document.getElementById("books");
-const search = document.getElementById("search");
-const genreFilter = document.getElementById("genreFilter");
+const body =
+  document.body;
 
-const bookForm = document.getElementById("bookForm");
-const submitMessage = document.getElementById("submitMessage");
+const themeButton =
+  document.getElementById("themeButton");
 
+const themeMenu =
+  document.getElementById("themeMenu");
 
-let userBooks =
-  JSON.parse(localStorage.getItem("openshelfBooks")) || [];
+const options =
+  document.querySelectorAll(".theme-option");
 
-
-function getAllBooks(){
-
-  return [
-    ...defaultBooks,
-    ...userBooks
-  ];
-
-}
+const dot =
+  document.querySelector(".theme-dot");
 
 
-function escapeHTML(value){
+/* =========================================================
+   SET THEME
+   ========================================================= */
 
-  return String(value).replace(/[&<>"']/g,char => ({
+function setTheme(theme, save = true) {
 
-    "&":"&amp;",
-    "<":"&lt;",
-    ">":"&gt;",
-    '"':"&quot;",
-    "'":"&#039;"
-
-  }[char]));
-
-}
-
-
-function displayBooks(list){
-
-  booksContainer.innerHTML = "";
-
-
-  if(list.length === 0){
-
-    booksContainer.innerHTML = `
-      <p style="
-        color:#999;
-        grid-column:1/-1;
-        padding:40px 0;
-      ">
-        No books found.
-      </p>
-    `;
-
-    return;
+  if (!THEMES.includes(theme)) {
+    theme = "light";
   }
 
+  body.dataset.theme = theme;
 
-  list.forEach(book => {
+  if (save) {
 
-    const card =
-      document.createElement("article");
+    try {
 
-    card.className = "card";
+      localStorage.setItem(
+        THEME_KEY,
+        theme
+      );
 
+    } catch (error) {}
 
-    card.innerHTML = `
+  }
 
-      <div class="cover ${escapeHTML(book.cover)}">
+  options.forEach(option => {
 
-        <div class="cover-top">
-
-          <span>OPENSHELF</span>
-
-          <span>
-            NO.
-            ${String(
-              getAllBooks().indexOf(book)+1
-            ).padStart(2,"0")}
-          </span>
-
-        </div>
-
-
-        <div class="cover-bottom">
-
-          <div class="cover-title">
-
-            ${escapeHTML(book.title)}
-
-          </div>
-
-
-          <div class="cover-author">
-
-            By ${escapeHTML(book.author)}
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="card-info">
-
-        <div class="genre">
-
-          ${escapeHTML(book.genre)}
-
-        </div>
-
-
-        <h3>
-
-          ${escapeHTML(book.title)}
-
-        </h3>
-
-
-        <p>
-
-          ${escapeHTML(book.description)}
-
-        </p>
-
-
-        <a
-          class="read"
-          href="${escapeHTML(book.link)}"
-        >
-
-          Read book →
-
-        </a>
-
-      </div>
-
-    `;
-
-
-    booksContainer.appendChild(card);
+    option.classList.toggle(
+      "selected",
+      option.dataset.themeChoice === theme
+    );
 
   });
 
+  const swatch =
+    document.querySelector(
+      `[data-theme-choice="${theme}"] .theme-swatch`
+    );
+
+  if (swatch) {
+
+    dot.style.background =
+      getComputedStyle(swatch).background;
+
+  }
+
 }
 
 
-function filterBooks(){
+/* =========================================================
+   LOAD SAVED THEME
+   ========================================================= */
 
-  const text =
-    search.value.toLowerCase().trim();
+function loadTheme() {
+
+  let saved =
+    "light";
+
+  try {
+
+    saved =
+      localStorage.getItem(
+        THEME_KEY
+      ) || "light";
+
+  } catch (error) {}
+
+  setTheme(
+    saved,
+    false
+  );
+
+}
+
+
+/* =========================================================
+   OPEN/CLOSE THEME MENU
+   ========================================================= */
+
+themeButton.addEventListener(
+  "click",
+  () => {
+
+    const open =
+      !themeMenu.hasAttribute(
+        "hidden"
+      );
+
+    if (open) {
+
+      themeMenu.setAttribute(
+        "hidden",
+        ""
+      );
+
+    } else {
+
+      themeMenu.removeAttribute(
+        "hidden"
+      );
+
+    }
+
+    themeButton.setAttribute(
+      "aria-expanded",
+      String(!open)
+    );
+
+  }
+);
+
+
+/* =========================================================
+   SELECT THEME
+   ========================================================= */
+
+options.forEach(option => {
+
+  option.addEventListener(
+    "click",
+    () => {
+
+      setTheme(
+        option.dataset.themeChoice
+      );
+
+      themeMenu.setAttribute(
+        "hidden",
+        ""
+      );
+
+      themeButton.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   CLOSE MENU WHEN CLICKING OUTSIDE
+   ========================================================= */
+
+document.addEventListener(
+  "click",
+  event => {
+
+    if (
+      !event.target.closest(
+        ".theme-picker"
+      )
+    ) {
+
+      themeMenu.setAttribute(
+        "hidden",
+        ""
+      );
+
+      themeButton.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   SEARCH
+   ========================================================= */
+
+const search =
+  document.getElementById(
+    "searchInput"
+  );
+
+const genre =
+  document.getElementById(
+    "genreFilter"
+  );
+
+const cards =
+  [
+    ...document.querySelectorAll(
+      ".book-card"
+    )
+  ];
+
+const empty =
+  document.getElementById(
+    "emptyState"
+  );
+
+const count =
+  document.getElementById(
+    "resultCount"
+  );
+
+
+function filterBooks() {
+
+  const query =
+    search.value
+      .trim()
+      .toLowerCase();
 
   const selectedGenre =
-    genreFilter.value;
+    genre.value;
+
+  let visible = 0;
 
 
-  const results =
-    getAllBooks().filter(book => {
+  cards.forEach(card => {
 
-      const matchesSearch =
+    const title =
+      card.dataset.title
+        .toLowerCase();
 
-        book.title
-          .toLowerCase()
-          .includes(text)
+    const author =
+      card.dataset.author
+        .toLowerCase();
 
-        ||
-
-        book.author
-          .toLowerCase()
-          .includes(text)
-
-        ||
-
-        book.genre
-          .toLowerCase()
-          .includes(text);
+    const cardGenre =
+      card.dataset.genre;
 
 
-      const matchesGenre =
-        selectedGenre === "all" ||
-        book.genre === selectedGenre;
+    const matchesText =
+
+      !query ||
+
+      title.includes(query) ||
+
+      author.includes(query) ||
+
+      cardGenre
+        .toLowerCase()
+        .includes(query);
 
 
-      return matchesSearch && matchesGenre;
+    const matchesGenre =
 
-    });
+      selectedGenre === "all" ||
+
+      cardGenre ===
+        selectedGenre;
 
 
-  displayBooks(results);
+    const show =
+      matchesText &&
+      matchesGenre;
+
+
+    card.hidden =
+      !show;
+
+
+    if (show) {
+      visible++;
+    }
+
+  });
+
+
+  empty.hidden =
+    visible !== 0;
+
+
+  count.textContent =
+    `${visible} ${
+      visible === 1
+        ? "book"
+        : "books"
+    }`;
 
 }
 
@@ -238,109 +314,41 @@ search.addEventListener(
   filterBooks
 );
 
-
-genreFilter.addEventListener(
+genre.addEventListener(
   "change",
   filterBooks
 );
 
 
-bookForm.addEventListener(
-  "submit",
-  event => {
+/* =========================================================
+   OPEN BOOK
+   ========================================================= */
 
-    event.preventDefault();
+function openBook(title) {
 
+  if (
+    title ===
+    "The Order Within"
+  ) {
 
-    const title =
-      document
-        .getElementById("bookTitle")
-        .value
-        .trim();
+    window.location.href =
+      "reader.html";
 
-
-    const author =
-      document
-        .getElementById("bookAuthor")
-        .value
-        .trim();
-
-
-    const genre =
-      document
-        .getElementById("bookGenre")
-        .value;
-
-
-    const description =
-      document
-        .getElementById("bookDescription")
-        .value
-        .trim();
-
-
-    userBooks.push({
-
-      title,
-      author,
-      genre,
-
-      cover:
-        getCoverClass(genre),
-
-      description,
-
-      link:
-        "reader.html?book=community-" +
-        Date.now()
-
-    });
-
-
-    localStorage.setItem(
-      "openshelfBooks",
-      JSON.stringify(userBooks)
-    );
-
-
-    bookForm.reset();
-
-
-    submitMessage.textContent =
-      "✓ Book added to your library.";
-
-
-    displayBooks(
-      getAllBooks()
-    );
-
-
-    setTimeout(
-      () => {
-        submitMessage.textContent = "";
-      },
-      4000
-    );
-
-  }
-);
-
-
-function getCoverClass(genre){
-
-  if(genre === "Fantasy"){
-    return "fantasy";
+    return;
   }
 
-  if(genre === "Sci-Fi"){
-    return "scifi";
-  }
 
-  return "mystery";
+  alert(
+    `${title}'s reader is coming soon.`
+  );
 
 }
 
 
-displayBooks(
-  getAllBooks()
-);
+/* =========================================================
+   START
+   ========================================================= */
+
+loadTheme();
+
+filterBooks();
