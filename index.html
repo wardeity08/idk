@@ -3,39 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenShelf</title>
 
-  <title>OpenShelf — Stories worth getting lost in.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
 
-<header>
-  <div class="nav">
-
+  <!-- ================= HEADER ================= -->
+  <header class="topbar">
     <a href="#" class="logo">
-      ◧ OpenShelf
+      <span class="logo-icon">◈</span>
+      <span>OpenShelf</span>
     </a>
 
     <nav>
-      <a href="#library">Library</a>
+      <a href="#library" class="active">Library</a>
       <a href="#submit">Submit</a>
       <a href="#about">About</a>
     </nav>
 
-    <a href="#submit" class="nav-button">
+    <button class="add-book" onclick="document.getElementById('submit').scrollIntoView({behavior:'smooth'})">
       Add a Book
-    </a>
-
-  </div>
-</header>
+    </button>
+  </header>
 
 
-<main>
-
-  <!-- HERO -->
-
+  <!-- ================= HERO ================= -->
   <section class="hero">
 
     <div class="hero-overlay"></div>
@@ -47,239 +45,267 @@
       </div>
 
       <h1>
-        Stories worth
-        <span>getting lost in.</span>
+        Stories worth<br>
+        <em>getting lost in.</em>
       </h1>
 
-      <p class="hero-description">
-        Discover stories, read chapter by chapter,
-        and share your own books with other readers.
+      <p>
+        Discover stories, read chapter by chapter, and share your own
+        books with other readers.
       </p>
 
       <div class="hero-buttons">
-
-        <a href="#library" class="main-button">
-          Explore Library →
+        <a href="#library" class="primary-btn">
+          Explore Library <span>→</span>
         </a>
 
-        <a href="#submit" class="secondary-button">
+        <a href="#submit" class="secondary-btn">
           Submit a Book
         </a>
-
       </div>
 
     </div>
 
-    <div class="hero-decoration">
 
-      <div class="floating-book book-a">
-        <span>THE LAST<br>TRAIN</span>
-      </div>
-
-      <div class="floating-book book-b">
-        <span>THE HOUSE<br>WITH NO CLOCK</span>
-      </div>
-
-      <div class="floating-book book-c">
-        <span>THE ORDER<br>WITHIN</span>
-      </div>
-
-    </div>
-
-  </section>
-
-
-  <!-- LIBRARY -->
-
-  <section id="library" class="library">
-
-    <div class="library-top">
-
-      <div>
-        <div class="eyebrow">THE COLLECTION</div>
-
-        <h2>
-          Featured Books
-        </h2>
-      </div>
-
-      <span class="view-all">
-        View All →
-      </span>
-
-    </div>
-
-
-    <div class="library-tools">
+    <!-- SEARCH -->
+    <div class="search-area">
 
       <div class="search-box">
-
-        <span>⌕</span>
+        <span class="search-icon">⌕</span>
 
         <input
-          id="search"
           type="text"
+          id="searchInput"
           placeholder="Search books, authors, genres..."
+          autocomplete="off"
         >
 
+        <select id="genreFilter">
+          <option value="all">All Genres</option>
+          <option value="Mystery">Mystery</option>
+          <option value="Fantasy">Fantasy</option>
+          <option value="Sci-Fi">Sci-Fi</option>
+          <option value="Psychological Thriller">Psychological Thriller</option>
+        </select>
       </div>
 
-      <select id="genreFilter">
-
-        <option value="all">
-          All Genres
-        </option>
-
-        <option value="Mystery">
-          Mystery
-        </option>
-
-        <option value="Fantasy">
-          Fantasy
-        </option>
-
-        <option value="Sci-Fi">
-          Sci-Fi
-        </option>
-
-        <option value="Psychological Thriller">
-          Psychological Thriller
-        </option>
-
-      </select>
-
     </div>
-
-
-    <div id="books" class="book-grid"></div>
 
   </section>
 
 
-  <!-- SUBMIT -->
+  <!-- ================= LIBRARY ================= -->
+  <main id="library" class="library-section">
 
-  <section id="submit" class="submit-section">
-
-    <div class="submit-box">
+    <div class="section-heading">
 
       <div>
-
-        <div class="eyebrow">
-          YOUR STORY
-        </div>
-
-        <h2>
-          Put your book<br>
-          on the shelf.
-        </h2>
-
-        <p>
-          Have something you've written?
-          Add it to the OpenShelf community.
-        </p>
-
+        <span class="section-label">DISCOVER</span>
+        <h2>Featured Books</h2>
       </div>
 
-
-      <form id="bookForm">
-
-        <input
-          id="bookTitle"
-          type="text"
-          placeholder="Book title"
-          required
-        >
-
-        <input
-          id="bookAuthor"
-          type="text"
-          placeholder="Author"
-          required
-        >
-
-        <select id="bookGenre" required>
-
-          <option value="">
-            Select genre
-          </option>
-
-          <option value="Mystery">
-            Mystery
-          </option>
-
-          <option value="Fantasy">
-            Fantasy
-          </option>
-
-          <option value="Sci-Fi">
-            Sci-Fi
-          </option>
-
-          <option value="Psychological Thriller">
-            Psychological Thriller
-          </option>
-
-        </select>
-
-        <textarea
-          id="bookDescription"
-          placeholder="Short description..."
-          required
-        ></textarea>
-
-        <button type="submit">
-          Add to OpenShelf →
-        </button>
-
-        <div id="submitMessage"></div>
-
-      </form>
+      <button class="view-all" id="viewAll">
+        View All <span>→</span>
+      </button>
 
     </div>
+
+
+    <div class="books-grid" id="bookGrid">
+
+      <!-- BOOK 1 -->
+      <article
+        class="book-card"
+        data-title="The Last Train"
+        data-author="Mara Ellis"
+        data-genre="Mystery"
+      >
+
+        <div
+          class="book-cover cover-one"
+          role="img"
+          aria-label="The Last Train"
+        >
+          <div class="cover-gradient"></div>
+          <span class="cover-small">MYSTERY</span>
+          <span class="cover-title">The Last<br>Train</span>
+        </div>
+
+        <div class="book-info">
+          <div>
+            <span class="genre">Mystery</span>
+            <h3>The Last Train</h3>
+            <p>Mara Ellis</p>
+          </div>
+
+          <button class="arrow-btn" onclick="openBook('The Last Train')">
+            ↗
+          </button>
+        </div>
+
+      </article>
+
+
+      <!-- BOOK 2 -->
+      <article
+        class="book-card"
+        data-title="The House With No Clock"
+        data-author="Eli Mercer"
+        data-genre="Fantasy"
+      >
+
+        <div
+          class="book-cover cover-two"
+          role="img"
+          aria-label="The House With No Clock"
+        >
+          <div class="cover-gradient"></div>
+          <span class="cover-small">FANTASY</span>
+          <span class="cover-title">The House<br>With No Clock</span>
+        </div>
+
+        <div class="book-info">
+          <div>
+            <span class="genre">Fantasy</span>
+            <h3>The House With No Clock</h3>
+            <p>Eli Mercer</p>
+          </div>
+
+          <button class="arrow-btn" onclick="openBook('The House With No Clock')">
+            ↗
+          </button>
+        </div>
+
+      </article>
+
+
+      <!-- BOOK 3 -->
+      <article
+        class="book-card"
+        data-title="Letters From Tomorrow"
+        data-author="Noah Vale"
+        data-genre="Sci-Fi"
+      >
+
+        <div
+          class="book-cover cover-three"
+          role="img"
+          aria-label="Letters From Tomorrow"
+        >
+          <div class="cover-gradient"></div>
+          <span class="cover-small">SCI-FI</span>
+          <span class="cover-title">Letters From<br>Tomorrow</span>
+        </div>
+
+        <div class="book-info">
+          <div>
+            <span class="genre">Sci-Fi</span>
+            <h3>Letters From Tomorrow</h3>
+            <p>Noah Vale</p>
+          </div>
+
+          <button class="arrow-btn" onclick="openBook('Letters From Tomorrow')">
+            ↗
+          </button>
+        </div>
+
+      </article>
+
+
+      <!-- YOUR BOOK -->
+      <article
+        class="book-card"
+        data-title="The Order Within"
+        data-author="Nikender Singh"
+        data-genre="Psychological Thriller"
+      >
+
+        <div
+          class="book-cover cover-four"
+          role="img"
+          aria-label="The Order Within"
+        >
+          <div class="cover-gradient"></div>
+          <span class="cover-small">PSYCHOLOGICAL THRILLER</span>
+          <span class="cover-title">The Order<br>Within</span>
+        </div>
+
+        <div class="book-info">
+          <div>
+            <span class="genre">Psychological Thriller</span>
+            <h3>The Order Within</h3>
+            <p>Nikender Singh</p>
+          </div>
+
+          <button class="arrow-btn" onclick="openBook('The Order Within')">
+            ↗
+          </button>
+        </div>
+
+      </article>
+
+    </div>
+
+    <div id="noResults" class="no-results">
+      No books found.
+    </div>
+
+  </main>
+
+
+  <!-- ================= SUBMIT ================= -->
+  <section id="submit" class="simple-section">
+
+    <span class="section-label">SHARE YOUR STORY</span>
+
+    <h2>Have a book to share?</h2>
+
+    <p>
+      Add your story to OpenShelf and let other readers discover it.
+    </p>
+
+    <button class="primary-btn" onclick="alert('Book submission coming soon!')">
+      Submit a Book →
+    </button>
 
   </section>
 
 
-  <!-- ABOUT -->
+  <!-- ================= ABOUT ================= -->
+  <section id="about" class="about-section">
 
-  <section id="about" class="about">
-
-    <div class="eyebrow">
-      ABOUT OPENSHELF
+    <div>
+      <span class="section-label">ABOUT OPENSHELF</span>
+      <h2>A library made by readers.</h2>
     </div>
 
-    <h2>
-      Books are better<br>
-      when they're shared.
-    </h2>
-
     <p>
-      OpenShelf is a small community library built for readers
-      and writers who want a simple place to discover stories,
-      read them, and put their own work on the shelf.
+      OpenShelf is a community library for discovering,
+      reading, and sharing original stories.
     </p>
 
   </section>
 
-</main>
+
+  <footer>
+    <span>OpenShelf</span>
+    <span>Built for readers.</span>
+  </footer>
 
 
-<footer>
+  <script src="app.js"></script>
 
-  <div>
-    <strong>OpenShelf</strong>
-    <span>Stories worth getting lost in.</span>
-  </div>
+  <script>
+    function openBook(title) {
 
-  <div class="creator">
-    <span>Created by</span>
-    <strong>Nikender</strong>
-  </div>
+      if (title === "The Order Within") {
+        window.location.href = "reader.html";
+      } else {
+        alert(title + " — reader coming soon.");
+      }
 
-</footer>
-
-
-<script src="app.js"></script>
+    }
+  </script>
 
 </body>
 </html>
