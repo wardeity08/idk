@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OpenShelf</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <div class="logo">📖 OpenShelf</div>
+
+    <nav>
+      <a href="#library">Library</a>
+      <a href="#about">About</a>
+    </nav>
+
+    <a class="button" href="#library">Explore</a>
+  </div>
+</header>
+
+<section class="hero">
+
+  <div>
+    <p class="eyebrow">A library built by readers</p>
+
+    <h1>
+      Stories worth<br>
+      <span>getting lost in.</span>
+    </h1>
+
+    <p class="description">
+      Discover stories, read chapter by chapter,
+      and find your next favorite book.
+    </p>
+
+    <a class="main-button" href="#library">
+      Browse Books →
+    </a>
+  </div>
+
+  <div class="books-art">
+    <div class="book book-one">THE<br>LAST<br>TRAIN</div>
+    <div class="book book-two">THE<br>HOUSE<br>WITH NO<br>CLOCK</div>
+    <div class="book book-three">LETTERS<br>FROM<br>TOMORROW</div>
+  </div>
+
+</section>
+
+
+<section id="library" class="library">
+
+  <p class="eyebrow">THE COLLECTION</p>
+
+  <h2>Explore the library</h2>
+
+  <input
+    id="search"
+    type="text"
+    placeholder="Search books..."
+  >
+
+  <div id="books" class="book-grid"></div>
+
+</section>
+
+
+<section id="about" class="about">
+
+  <p class="eyebrow">ABOUT OPENSHELF</p>
+
+  <h2>Read. Discover. Share.</h2>
+
+  <p>
+    OpenShelf is a community library where readers
+    can discover stories and explore new worlds.
+  </p>
+
+</section>
+
+
+<footer>
+  <strong>OpenShelf</strong>
+  <span>Made for readers.</span>
+</footer>
+
+<script src="app.js"></script>
+
+</body>
+</html>
