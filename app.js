@@ -1,47 +1,37 @@
 const defaultBooks = [
-
   {
     title: "The Last Train",
     author: "Mara Ellis",
     genre: "Mystery",
     cover: "mystery",
-    description:
-      "A missing passenger, an empty station, and one final train.",
+    description: "A missing passenger, an empty station, and one final train.",
     link: "reader.html?book=last-train"
   },
-
   {
     title: "The House With No Clock",
     author: "Eli Mercer",
     genre: "Fantasy",
     cover: "fantasy",
-    description:
-      "A mysterious house appears at midnight.",
+    description: "A mysterious house appears at midnight.",
     link: "reader.html?book=house"
   },
-
   {
     title: "Letters From Tomorrow",
     author: "Noah Vale",
     genre: "Sci-Fi",
     cover: "scifi",
-    description:
-      "A student receives letters written by his future self.",
+    description: "A student receives letters written by his future self.",
     link: "reader.html?book=letters"
   },
-
   {
     title: "The Order Within",
     author: "Nikender Singh",
     genre: "Psychological Thriller",
     cover: "mystery",
-    description:
-      "A psychological murder mystery about trust, hidden motives, and a cold case that refuses to stay buried.",
+    description: "A psychological thriller about trust, hidden motives, and a cold case that refuses to stay buried.",
     link: "reader.html?book=order-within"
   }
-
 ];
-
 
 const booksContainer = document.getElementById("books");
 const search = document.getElementById("search");
@@ -50,82 +40,91 @@ const genreFilter = document.getElementById("genreFilter");
 const bookForm = document.getElementById("bookForm");
 const submitMessage = document.getElementById("submitMessage");
 
-
-/* LOAD USER BOOKS */
-
 let userBooks =
   JSON.parse(localStorage.getItem("openshelfBooks")) || [];
 
 
 function getAllBooks() {
-
   return [...defaultBooks, ...userBooks];
-
 }
 
 
-/* DISPLAY BOOKS */
+function escapeHTML(value) {
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;"
+  }[char]));
+}
+
 
 function displayBooks(list) {
 
   booksContainer.innerHTML = "";
 
-  if (list.length === 0) {
+  if (!list.length) {
 
-    booksContainer.innerHTML = `
-      <p style="
-        color:#929096;
-        grid-column:1/-1;
-        padding:30px 0;
-      ">
-        No books found.
-      </p>
-    `;
+    booksContainer.innerHTML =
+      '<p style="color:#929096;grid-column:1/-1;padding:30px 0">No books found.</p>';
 
     return;
   }
 
-
   list.forEach(book => {
 
-    const card = document.createElement("div");
+    const card = document.createElement("article");
 
     card.className = "card";
 
-
     card.innerHTML = `
+      <div class="cover ${escapeHTML(book.cover)}">
 
-      <div class="cover ${book.cover}">
-        ${book.title}
+        <div class="cover-top">
+          <span>OPENSHELF</span>
+          <span>
+            NO. ${String(getAllBooks().indexOf(book) + 1).padStart(2, "0")}
+          </span>
+        </div>
+
+        <div class="cover-bottom">
+
+          <div class="cover-title">
+            ${escapeHTML(book.title)}
+          </div>
+
+          <div class="cover-author">
+            By ${escapeHTML(book.author)}
+          </div>
+
+        </div>
+
       </div>
 
       <div class="card-info">
 
         <div class="genre">
-          ${book.genre}
+          ${escapeHTML(book.genre)}
         </div>
 
         <h3>
-          ${book.title}
+          ${escapeHTML(book.title)}
         </h3>
 
         <p>
-          by ${book.author}
-          <br><br>
-          ${book.description}
+          ${escapeHTML(book.description)}
         </p>
 
         <a
           class="read"
-          href="${book.link}"
+          href="${escapeHTML(book.link)}"
         >
           Read book →
         </a>
 
       </div>
-
     `;
-
 
     booksContainer.appendChild(card);
 
@@ -133,8 +132,6 @@ function displayBooks(list) {
 
 }
 
-
-/* FILTER BOOKS */
 
 function filterBooks() {
 
@@ -144,39 +141,31 @@ function filterBooks() {
   const selectedGenre =
     genreFilter.value;
 
+  const results =
+    getAllBooks().filter(book => {
 
-  const results = getAllBooks().filter(book => {
+      const matchesSearch =
+        book.title.toLowerCase().includes(text) ||
+        book.author.toLowerCase().includes(text) ||
+        book.genre.toLowerCase().includes(text);
 
-    const matchesSearch =
-      book.title.toLowerCase().includes(text) ||
-      book.author.toLowerCase().includes(text) ||
-      book.genre.toLowerCase().includes(text);
+      const matchesGenre =
+        selectedGenre === "all" ||
+        book.genre === selectedGenre;
 
+      return matchesSearch && matchesGenre;
 
-    const matchesGenre =
-      selectedGenre === "all" ||
-      book.genre === selectedGenre;
-
-
-    return matchesSearch && matchesGenre;
-
-  });
-
+    });
 
   displayBooks(results);
 
 }
 
 
-/* SEARCH */
-
 search.addEventListener(
   "input",
   filterBooks
 );
-
-
-/* GENRE FILTER */
 
 genreFilter.addEventListener(
   "change",
@@ -184,14 +173,11 @@ genreFilter.addEventListener(
 );
 
 
-/* SUBMIT BOOK */
-
 bookForm.addEventListener(
   "submit",
-  function(event) {
+  event => {
 
     event.preventDefault();
-
 
     const title =
       document.getElementById("bookTitle").value.trim();
@@ -206,26 +192,22 @@ bookForm.addEventListener(
       document.getElementById("bookDescription").value.trim();
 
 
-    const newBook = {
+    userBooks.push({
 
-      title: title,
+      title,
+      author,
+      genre,
 
-      author: author,
+      cover:
+        getCoverClass(genre),
 
-      genre: genre,
-
-      cover: getCoverClass(genre),
-
-      description: description,
+      description,
 
       link:
         "reader.html?book=community-" +
         Date.now()
 
-    };
-
-
-    userBooks.push(newBook);
+    });
 
 
     localStorage.setItem(
@@ -236,25 +218,22 @@ bookForm.addEventListener(
 
     bookForm.reset();
 
-
     submitMessage.textContent =
       "✓ Book added to your library.";
 
+    displayBooks(
+      getAllBooks()
+    );
 
-    displayBooks(getAllBooks());
 
-
-    setTimeout(() => {
-
-      submitMessage.textContent = "";
-
-    }, 4000);
+    setTimeout(
+      () => submitMessage.textContent = "",
+      4000
+    );
 
   }
 );
 
-
-/* CHOOSE COVER STYLE */
 
 function getCoverClass(genre) {
 
@@ -271,6 +250,6 @@ function getCoverClass(genre) {
 }
 
 
-/* INITIAL DISPLAY */
-
-displayBooks(getAllBooks());
+displayBooks(
+  getAllBooks()
+);
