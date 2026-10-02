@@ -24,6 +24,15 @@ const books = [
     cover: "scifi",
     description: "A student receives letters written by his future self.",
     link: "reader.html?book=letters"
+  },
+
+  {
+    title: "The Order Within",
+    author: "Nikender Singh",
+    genre: "Psychological Thriller",
+    cover: "mystery",
+    description: "A psychological murder mystery where trust, order, and hidden motives collide.",
+    link: "reader.html?book=order-within"
   }
 ];
 
