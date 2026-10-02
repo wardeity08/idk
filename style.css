@@ -14,8 +14,17 @@ html {
 
 body {
   font-family: "DM Sans", sans-serif;
-  background: #10100f;
   color: #f7f3ec;
+
+  /* MAIN BACKGROUND IMAGE — stays while scrolling */
+  background:
+    linear-gradient(
+      rgba(8, 8, 7, .45),
+      rgba(8, 8, 7, .72)
+    ),
+    url("hero-bg.jpg") center top / cover fixed no-repeat;
+
+  min-height: 100vh;
 }
 
 button,
@@ -155,10 +164,8 @@ nav a.active::after {
 
   overflow: hidden;
 
-  background:
-    url("hero-bg.jpg")
-    center center / cover
-    no-repeat;
+  /* Background is now on BODY */
+  background: transparent;
 }
 
 
@@ -235,7 +242,9 @@ nav a.active::after {
 }
 
 
-/* HERO BUTTONS */
+/* =========================
+   HERO BUTTONS
+========================= */
 
 .hero-buttons {
   display: flex;
@@ -376,13 +385,14 @@ nav a.active::after {
 
   padding: 85px 8vw 110px;
 
+  /* Transparent so body image remains visible */
   background:
     radial-gradient(
       circle at 70% 0%,
       rgba(115,65,38,.22),
       transparent 35%
     ),
-    #111110;
+    rgba(17,17,16,.58);
 }
 
 .section-heading {
@@ -726,7 +736,7 @@ nav a.active::after {
 
   text-align: center;
 
-  background: #171615;
+  background: rgba(23,22,21,.62);
 }
 
 .simple-section .section-label {
@@ -759,7 +769,7 @@ nav a.active::after {
   justify-content: space-between;
   gap: 60px;
 
-  background: #10100f;
+  background: rgba(16,16,15,.62);
 }
 
 .about-section > * {
@@ -787,7 +797,7 @@ footer {
 
   border-top: 1px solid rgba(255,255,255,.08);
 
-  background: #0c0c0b;
+  background: rgba(12,12,11,.82);
 
   color: rgba(255,255,255,.4);
 
