@@ -3,15 +3,25 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="OpenShelf — a community library for discovering and sharing stories.">
+
+<meta
+  name="description"
+  content="OpenShelf — a community library for discovering and sharing stories."
+>
+
 <title>OpenShelf — Community Library</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet">
+
+<link
+  href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;1,500;1,600&display=swap"
+  rel="stylesheet"
+>
 
 <link rel="stylesheet" href="style.css">
 </head>
+
 
 <body data-theme="light">
 
@@ -22,21 +32,30 @@
     <span>OpenShelf</span>
   </a>
 
+
   <nav class="main-nav">
     <a class="active" href="#library">Library</a>
     <a href="#submit">Submit</a>
     <a href="#about">About</a>
   </nav>
 
+
   <div class="header-actions">
 
+    <!-- THEME PICKER -->
     <div class="theme-picker">
 
-      <button class="theme-button" id="themeButton" type="button" aria-expanded="false">
+      <button
+        class="theme-button"
+        id="themeButton"
+        type="button"
+        aria-expanded="false"
+      >
         <span class="theme-dot"></span>
         <span>Theme</span>
         <span>⌄</span>
       </button>
+
 
       <div class="theme-menu" id="themeMenu" hidden>
 
@@ -44,44 +63,74 @@
           Reading atmosphere
         </div>
 
-        <button class="theme-option" data-theme-choice="light" type="button">
+
+        <button
+          class="theme-option"
+          data-theme-choice="light"
+          type="button"
+        >
           <span class="theme-swatch light-swatch"></span>
+
           <span>
             <strong>Light</strong>
             <small>Clean & airy</small>
           </span>
+
           <span class="check">✓</span>
         </button>
 
-        <button class="theme-option" data-theme-choice="cozy" type="button">
+
+        <button
+          class="theme-option"
+          data-theme-choice="cozy"
+          type="button"
+        >
           <span class="theme-swatch cozy-swatch"></span>
+
           <span>
             <strong>Cozy Library</strong>
             <small>Warm & classic</small>
           </span>
+
           <span class="check">✓</span>
         </button>
 
-        <button class="theme-option" data-theme-choice="cafe" type="button">
+
+        <button
+          class="theme-option"
+          data-theme-choice="cafe"
+          type="button"
+        >
           <span class="theme-swatch cafe-swatch"></span>
+
           <span>
             <strong>Café & Books</strong>
             <small>Relaxed & welcoming</small>
           </span>
+
           <span class="check">✓</span>
         </button>
 
-        <button class="theme-option" data-theme-choice="editorial" type="button">
+
+        <button
+          class="theme-option"
+          data-theme-choice="editorial"
+          type="button"
+        >
           <span class="theme-swatch editorial-swatch"></span>
+
           <span>
             <strong>Editorial</strong>
             <small>Elegant & literary</small>
           </span>
+
           <span class="check">✓</span>
         </button>
 
       </div>
+
     </div>
+
 
     <a class="add-book" href="#submit">
       + Add a Book
@@ -92,7 +141,13 @@
 </header>
 
 
+
 <main id="top">
+
+
+<!-- =========================
+     HERO
+========================= -->
 
 <section class="hero">
 
@@ -104,28 +159,39 @@
         A LIBRARY BUILT BY READERS
       </p>
 
+
       <h1>
         Stories worth<br>
         <em>getting lost in.</em>
       </h1>
 
+
       <p class="hero-text">
         Discover stories, read chapter by chapter, and share your own books with other readers.
       </p>
 
+
       <div class="hero-actions">
 
-        <a class="button primary" href="#library">
+        <a
+          class="button primary"
+          href="#library"
+        >
           Explore Library <span>→</span>
         </a>
 
-        <a class="button secondary" href="#submit">
+
+        <a
+          class="button secondary"
+          href="#submit"
+        >
           Submit a Book
         </a>
 
       </div>
 
     </div>
+
 
     <div class="hero-note">
       <span></span>
@@ -137,11 +203,19 @@
 </section>
 
 
+
+<!-- =========================
+     SEARCH
+========================= -->
+
 <section class="search-section">
 
   <div class="search-box">
 
-    <span class="search-symbol">⌕</span>
+    <span class="search-symbol">
+      ⌕
+    </span>
+
 
     <input
       id="searchInput"
@@ -150,12 +224,14 @@
       autocomplete="off"
     >
 
-    <select id="genreFilter" aria-label="Filter by genre">
-      <option value="all">All Genres</option>
-      <option value="Mystery">Mystery</option>
-      <option value="Fantasy">Fantasy</option>
-      <option value="Sci-Fi">Sci-Fi</option>
-      <option value="Psychological Thriller">Psychological Thriller</option>
+
+    <select
+      id="genreFilter"
+      aria-label="Filter by genre"
+    >
+      <option value="all">
+        All Genres
+      </option>
     </select>
 
   </div>
@@ -163,234 +239,64 @@
 </section>
 
 
-<section class="library-section" id="library">
+
+<!-- =========================
+     LIBRARY
+========================= -->
+
+<section
+  class="library-section"
+  id="library"
+>
 
   <div class="section-heading">
 
     <div>
+
       <p class="section-kicker">
-        CURATED FOR YOU
+        THE COMMUNITY LIBRARY
       </p>
 
       <h2>
-        Featured Books
+        Books
       </h2>
+
     </div>
 
+
     <span id="resultCount">
-      4 books
+      Loading books...
     </span>
 
   </div>
 
 
-  <div class="book-grid" id="bookGrid">
+  <!-- BOOKS WILL BE LOADED FROM SUPABASE -->
 
-
-    <article
-      class="book-card"
-      data-title="The Last Train"
-      data-author="Mara Ellis"
-      data-genre="Mystery"
-    >
-
-      <div class="book-cover cover-train">
-
-        <span class="cover-label">
-          MYSTERY
-        </span>
-
-        <span class="cover-title">
-          The<br>
-          Last Train
-        </span>
-
-      </div>
-
-      <div class="book-info">
-
-        <span class="book-genre">
-          Mystery
-        </span>
-
-        <h3>
-          The Last Train
-        </h3>
-
-        <p>
-          by Mara Ellis
-        </p>
-
-      </div>
-
-      <button
-        class="card-arrow"
-        onclick="openBook('The Last Train')"
-        aria-label="Open The Last Train"
-      >
-        ↗
-      </button>
-
-    </article>
-
-
-
-    <article
-      class="book-card"
-      data-title="The House With No Clock"
-      data-author="Eli Mercer"
-      data-genre="Fantasy"
-    >
-
-      <div class="book-cover cover-house">
-
-        <span class="cover-label">
-          FANTASY
-        </span>
-
-        <span class="cover-title">
-          The House<br>
-          With No Clock
-        </span>
-
-      </div>
-
-      <div class="book-info">
-
-        <span class="book-genre">
-          Fantasy
-        </span>
-
-        <h3>
-          The House With No Clock
-        </h3>
-
-        <p>
-          by Eli Mercer
-        </p>
-
-      </div>
-
-      <button
-        class="card-arrow"
-        onclick="openBook('The House With No Clock')"
-        aria-label="Open The House With No Clock"
-      >
-        ↗
-      </button>
-
-    </article>
-
-
-
-    <article
-      class="book-card"
-      data-title="Letters From Tomorrow"
-      data-author="Noah Vale"
-      data-genre="Sci-Fi"
-    >
-
-      <div class="book-cover cover-space">
-
-        <span class="cover-label">
-          SCI-FI
-        </span>
-
-        <span class="cover-title">
-          Letters From<br>
-          Tomorrow
-        </span>
-
-      </div>
-
-      <div class="book-info">
-
-        <span class="book-genre">
-          Sci-Fi
-        </span>
-
-        <h3>
-          Letters From Tomorrow
-        </h3>
-
-        <p>
-          by Noah Vale
-        </p>
-
-      </div>
-
-      <button
-        class="card-arrow"
-        onclick="openBook('Letters From Tomorrow')"
-        aria-label="Open Letters From Tomorrow"
-      >
-        ↗
-      </button>
-
-    </article>
-
-
-
-    <article
-      class="book-card"
-      data-title="The Order Within"
-      data-author="Nikender Singh"
-      data-genre="Psychological Thriller"
-    >
-
-      <div class="book-cover cover-order">
-
-        <span class="cover-label">
-          PSYCHOLOGICAL THRILLER
-        </span>
-
-        <span class="spider-lily">
-          ✿
-        </span>
-
-        <span class="cover-title">
-          The<br>
-          Order Within
-        </span>
-
-      </div>
-
-      <div class="book-info">
-
-        <span class="book-genre">
-          Psychological Thriller
-        </span>
-
-        <h3>
-          The Order Within
-        </h3>
-
-        <p>
-          by Nikender Singh
-        </p>
-
-      </div>
-
-      <button
-        class="card-arrow"
-        onclick="openBook('The Order Within')"
-        aria-label="Open The Order Within"
-      >
-        ↗
-      </button>
-
-    </article>
-
+  <div
+    class="book-grid"
+    id="bookGrid"
+  >
   </div>
 
 
-  <div class="empty-state" id="emptyState" hidden>
+  <!-- EMPTY STATE -->
 
-    <div>⌕</div>
+  <div
+    class="empty-state"
+    id="emptyState"
+    hidden
+  >
+
+    <div>
+      ⌕
+    </div>
+
 
     <h3>
       No books found
     </h3>
+
 
     <p>
       Try a different title, author, or genre.
@@ -401,7 +307,13 @@
 </section>
 
 
+
+<!-- =========================
+     FEATURES
+========================= -->
+
 <section class="feature-strip">
+
 
   <div class="feature">
 
@@ -410,6 +322,7 @@
     </span>
 
     <div>
+
       <strong>
         Read chapter by chapter
       </strong>
@@ -417,9 +330,11 @@
       <p>
         Pick up where you left off.
       </p>
+
     </div>
 
   </div>
+
 
 
   <div class="feature">
@@ -429,6 +344,7 @@
     </span>
 
     <div>
+
       <strong>
         Share your stories
       </strong>
@@ -436,9 +352,11 @@
       <p>
         Give your writing a home.
       </p>
+
     </div>
 
   </div>
+
 
 
   <div class="feature">
@@ -448,6 +366,7 @@
     </span>
 
     <div>
+
       <strong>
         Find your next read
       </strong>
@@ -455,6 +374,7 @@
       <p>
         Search by genre, author, or title.
       </p>
+
     </div>
 
   </div>
@@ -462,7 +382,15 @@
 </section>
 
 
-<section class="content-section" id="submit">
+
+<!-- =========================
+     SUBMIT BOOK
+========================= -->
+
+<section
+  class="content-section"
+  id="submit"
+>
 
   <div class="content-copy">
 
@@ -470,41 +398,145 @@
       YOUR STORY BELONGS HERE
     </p>
 
+
     <h2>
       Have a book to share?
     </h2>
 
-    <p>
-      OpenShelf is built around readers and writers. Add your story and give other readers a chance to discover it.
-    </p>
 
-    <a
-      class="button primary"
-      href="mailto:openshelf@example.com?subject=Book%20Submission"
-    >
-      Submit a Book <span>→</span>
-    </a>
+    <p>
+      Add your book to the OpenShelf community. Upload the book file and its cover so readers can discover it.
+    </p>
 
   </div>
 
 
-  <div class="content-card">
 
-    <span>
-      OPEN
-    </span>
+  <div class="content-card openshelf-form-card">
 
-    <strong>
-      Stories<br>
-      for everyone.
-    </strong>
+    <form
+      id="bookForm"
+      class="book-form"
+    >
+
+      <!-- TITLE -->
+
+      <label for="bookTitle">
+        Book title
+      </label>
+
+      <input
+        id="bookTitle"
+        name="title"
+        type="text"
+        placeholder="Enter the book title"
+        required
+      >
+
+
+      <!-- AUTHOR -->
+
+      <label for="bookAuthor">
+        Author
+      </label>
+
+      <input
+        id="bookAuthor"
+        name="author"
+        type="text"
+        placeholder="Enter the author's name"
+        required
+      >
+
+
+      <!-- GENRE -->
+
+      <label for="bookGenre">
+        Genre
+      </label>
+
+      <input
+        id="bookGenre"
+        name="genre"
+        type="text"
+        placeholder="e.g. Mystery, Fantasy, Romance"
+        required
+      >
+
+
+      <!-- BOOK FILE -->
+
+      <label for="bookFile">
+        Book file
+      </label>
+
+      <input
+        id="bookFile"
+        name="bookFile"
+        type="file"
+        accept=".docx,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        required
+      >
+
+      <small>
+        Currently supported: DOCX
+      </small>
+
+
+      <!-- COVER -->
+
+      <label for="coverFile">
+        Cover image
+      </label>
+
+      <input
+        id="coverFile"
+        name="coverFile"
+        type="file"
+        accept="image/*"
+        required
+      >
+
+      <small>
+        JPG, PNG, WEBP and other common image formats
+      </small>
+
+
+      <!-- SUBMIT -->
+
+      <button
+        class="button primary"
+        type="submit"
+        id="submitBookButton"
+      >
+        Add Book <span>→</span>
+      </button>
+
+
+      <!-- STATUS -->
+
+      <p
+        id="uploadStatus"
+        class="upload-status"
+        aria-live="polite"
+      ></p>
+
+    </form>
 
   </div>
 
 </section>
 
 
-<section class="content-section about" id="about">
+
+<!-- =========================
+     ABOUT
+========================= -->
+
+<section
+  class="content-section about"
+  id="about"
+>
 
   <div>
 
@@ -512,12 +544,14 @@
       ABOUT OPENSHELF
     </p>
 
+
     <h2>
       A small corner<br>
       for big stories.
     </h2>
 
   </div>
+
 
   <p>
     OpenShelf is a community-style digital library where readers can discover independent stories and writers can share their work.
@@ -527,6 +561,11 @@
 
 </main>
 
+
+
+<!-- =========================
+     FOOTER
+========================= -->
 
 <footer>
 
@@ -542,12 +581,21 @@
 
   </div>
 
+
   <p>
     Read something worth remembering.
   </p>
 
 </footer>
 
+
+
+<!-- SUPABASE -->
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+
+<!-- APP -->
 
 <script src="app.js"></script>
 
